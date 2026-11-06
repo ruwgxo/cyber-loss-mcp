@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cyber-loss-mcp:unverified-log:1.0.0",
+  "title": "cyber-loss-mcp unverified figures log 1.0.0",
+  "description": "Append-only log. A past entry is never edited; a change is a new entry that names the entry it supersedes.",
+  "type": "object",
+  "required": [
+    "title",
+    "id",
+    "updated",
+    "standard",
+    "profile",
+    "inline_markup",
+    "meta",
+    "entries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "$ref": "#/$defs/text_short"
+    },
+    "id": {
+      "const": "unverified-log"
+    },
+    "updated": {
+      "$ref": "#/$defs/date"
+    },
+    "standard": {
+      "const": "2.0.0"
+    },
+    "profile": {
+      "const": "../src/cyber_loss_mcp/standards/20261106__Cyber_Loss_Unverified_Log_Profile_by_Raghav_Dinesh.yaml"
+    },
+    "inline_markup": {
+      "const": "none"
+    },
+    "description": {
+      "$ref": "#/$defs/text_long"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "log_schema"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "log_schema": {
+          "const": "1.0.0"
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claim",
+          "date",
+          "id",
+          "organisation",
+          "reason",
+          "seen_in",
+          "status",
+          "supersedes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "organisation": {
+            "$ref": "#/$defs/text_short"
+          },
+          "claim": {
+            "$ref": "#/$defs/text_short"
+          },
+          "seen_in": {
+            "$ref": "#/$defs/text_short"
+          },
+          "reason": {
+            "$ref": "#/$defs/text_long"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "included",
+              "rejected"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^unv-[1-9][0-9]*$"
+          },
+          "supersedes": {
+            "type": "string",
+            "pattern": "^(none|unv-[1-9][0-9]*)$"
+          },
+          "date": {
+            "$ref": "#/$defs/date"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "format": "date"
+    },
+    "text_short": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "text_long": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    }
+  }
+}

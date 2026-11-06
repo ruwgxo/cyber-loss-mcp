@@ -1,0 +1,45 @@
+record: PROFILE
+title: Cyber Loss Incident Profile
+updated: '2026-11-06'
+standard: '2.0.0'
+authors:
+- Raghav Dinesh
+description: >
+  Maps the domain keys of a cyber-loss-mcp incident record onto YAML Markup Standard
+  2.0.0 blocks, so a record can be rendered as a readable page.
+maps:
+  incident:
+  - {block: lead, from: summary}
+  - block: prose
+    text: >-
+      Organisation: {organisation} ({organisation_kind}), country {country}. Sector: NAICS
+      {sector}, {sector_basis}. First disclosed {first_disclosed}.
+  - {block: list, style: bullet, from: attack_types}
+  - {block: prose, text: 'Basis for the attack type ({attack_type_source}): {attack_type_basis}'}
+  techniques[]:
+  - {block: prose, text: 'MITRE ATT&CK {id} ({source}): {basis}'}
+  loss_figures:
+  - {block: heading, level: 2, text: Loss figures}
+  loss_figures[]:
+  - {block: heading, level: 3, id: '{id}', text: '{as_stated}'}
+  - {block: quote, from: quote, source: '{source}, {locator}'}
+  - block: prose
+    text: >-
+      Loss type {loss_type}; status {status}; currency {currency}; insurance basis
+      {insurance_basis}.
+  loss_figures[].values:
+  - {visibility: internal}
+  sources:
+  - {block: heading, level: 2, text: Sources}
+  sources[]:
+  - {block: heading, level: 3, id: '{id}', text: '{title}'}
+  - block: prose
+    text: >-
+      {publisher} ({type}). Published {published}; retrieved {retrieved}. URL: {url}
+  sources[].sec:
+  - {visibility: internal}
+  verification:
+  - {block: heading, level: 2, text: Verification}
+  verification[]:
+  - {block: prose, text: 'Figure {figure}, checked {checked_on}: {method}'}
+unmapped: error

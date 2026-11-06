@@ -1,0 +1,94 @@
+# FICTIONAL TEST FIXTURE. Example Manufacturing Inc., its CIK, accession numbers and
+# every figure below are invented to exercise the validator. None of it is real data.
+title: Example Manufacturing ransomware incident, 2024
+id: inc-2024-example-manufacturing
+updated: '2026-11-06'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Example Manufacturing Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '31-33'
+  sector_basis: EDGAR SIC 3714 (motor vehicle parts), NAICS sector 31-33
+  first_disclosed: '2024-01-15'
+  attack_types: [ransomware]
+  attack_type_basis: >
+    The 8-K says the company detected ransomware that encrypted certain
+    production systems.
+  attack_type_source: src-1
+  summary: >
+    Example Manufacturing disclosed a ransomware attack that encrypted
+    production systems, and later reported its remediation costs.
+
+techniques:
+- id: T1486
+  basis: The source says production systems were encrypted.
+  source: src-1
+
+loss_figures:
+- id: fig-1
+  as_stated: approximately $12.3 million
+  loss_type: remediation
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-2
+  locator: Form 10-Q, Part I, Item 2, page 31
+  quote: >
+    During the quarter we incurred approximately $12.3 million of costs to
+    restore affected systems.
+  values:
+    qualifier: approximately
+    amount: '12300000'
+    period_start: '2024-01-01'
+    period_end: '2024-03-31'
+    cumulative: true
+- id: fig-2
+  as_stated: between $2 million and $4 million
+  loss_type: revenue_impact
+  status: estimated
+  currency: USD
+  insurance_basis: not_stated
+  source: src-2
+  locator: Form 10-Q, Part I, Item 2, page 32
+  quote: >
+    We estimate lost net sales of between $2 million and $4 million.
+  values:
+    qualifier: exact
+    amount_low: '2000000'
+    amount_high: '4000000'
+    period_end: '2024-03-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: Example Manufacturing Inc.
+  title: Form 8-K, Item 1.05, filed 15 January 2024
+  url: https://www.sec.gov/Archives/edgar/data/1/000000000124000001/ex-8k.htm
+  published: '2024-01-15'
+  retrieved: '2026-11-06'
+  sec: {form: 8-K, item: '1.05', cik: '0000000001', accession: 0000000001-24-000001}
+- id: src-2
+  type: sec_filing
+  publisher: Example Manufacturing Inc.
+  title: Form 10-Q for the quarter ended 31 March 2024
+  url: https://www.sec.gov/Archives/edgar/data/1/000000000124000002/ex-10q.htm
+  published: '2024-05-08'
+  retrieved: '2026-11-06'
+  sec: {form: 10-Q, cik: '0000000001', accession: 0000000001-24-000002}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-06'
+  method: >
+    Fixture only: describes the check a real record would record.
+- figure: fig-2
+  checked_on: '2026-11-06'
+  method: >
+    Fixture only: describes the check a real record would record.

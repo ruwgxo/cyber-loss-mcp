@@ -10,9 +10,10 @@ statement, or, for aggregates only, the FBI IC3 annual report. Figures the
 source discloses and figures that are estimates are kept apart and labelled.
 A figure that can't be checked against its source isn't included.
 
-> **Status: design phase.** There is no server code or data in this repository
-> yet. The sections below describe the intended behaviour. They will be updated
-> as each part lands and is verified.
+> **Status: schema and validation built; no incident data or server yet.** The
+> [design](docs/DESIGN.md) is approved. The record schema and its validator are in
+> place, and every record will be checked in CI ([how](docs/VALIDATION.md)). The tools
+> below describe the intended behaviour and will be updated as each part lands.
 
 ## Why it exists
 
@@ -88,7 +89,20 @@ If a figure doesn't match its source, or its source doesn't support it, please
 
 Reported errors take priority over new data.
 
+## Checking the data yourself
+
+```bash
+uv sync
+uv run cyber-loss-validate
+```
+
+This runs the same checks as CI. Among them, each figure's stored amount must equal an
+exact reading of the source's own words, and each source must be on an allowlisted host.
+[docs/VALIDATION.md](docs/VALIDATION.md) lists every rule.
+
 ## Licence
 
-The code is released under the [MIT License](LICENSE). The licence for the
-dataset will be set out in the design doc before any data is added.
+The code is released under the [MIT License](LICENSE). The dataset, the logs, the YAML
+Markup Standard and the profiles are released under
+[CC BY 4.0](LICENSE-DATA). The facts themselves, and the source documents cited, are
+not ours to license.

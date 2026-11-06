@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, types, tests and data (Python ${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # the log check compares with the base branch
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: false
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run coverage run -m pytest
+      - run: uv run coverage report
+      - name: Validate dataset and logs
+        env:
+          # On a pull request, logs may only be appended to relative to the base
+          # branch; on main, relative to the previous commit.
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'HEAD~1' }}
+        run: uv run cyber-loss-validate --base-ref "$BASE_REF"
+
+  audit:
+    name: Dependency and workflow audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.13"
+          enable-cache: false
+      - name: Audit locked dependencies
+        run: |
+          uv export --locked --all-groups --no-emit-project --format requirements-txt > requirements.txt
+          uvx pip-audit@2.10.1 --strict --require-hashes --disable-pip -r requirements.txt
+      - name: Audit workflows
+        env:
+          GH_TOKEN: ${{ github.token }} # read-only; lets zizmor check pinned action commits
+        run: uvx zizmor@1.31.1 --persona=pedantic .github/workflows
