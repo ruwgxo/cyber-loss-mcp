@@ -1,7 +1,8 @@
 # cyber-loss-mcp design
 
-Status: **draft for review**. Nothing here is built yet. Decisions marked
-**Decision needed** are listed together in [section 10](#10-decisions-needed).
+Status: **approved 2026-11-06**, with the defaults in [section 10](#10-decisions).
+Schema and validation are built; see [VALIDATION.md](VALIDATION.md). The server is not
+built yet.
 
 ## 1. Purpose and non-goals
 
@@ -65,27 +66,25 @@ and its tests, not from the annotations.
 
 ```
 src/cyber_loss_mcp/
-  server.py            tool registration, stdio entry point
-  models.py            Pydantic models for records and tool I/O
-  dataset.py           loads and validates the bundled data at startup, fails closed
-  stats.py             Decimal-only order statistics
-  tools/               one module per tool
-  data/
-    incidents/         one YAML record per incident
-    aggregates/        FBI IC3 annual figures
-schemas/
-  incident.schema.json domain schema (JSON Schema 2020-12)
-  aggregate.schema.json
-standards/
-  <the YAML Markup Standard v2.0.0, vendored with a pinned SHA-256>
-  <the dataset profile, a PROFILE record mapping domain keys to blocks>
+  server.py            tool registration, stdio entry point (step 3)
+  models.py            Pydantic models for records and tool I/O (step 3)
+  dataset.py           loads and validates the bundled data at startup, fails closed (step 3)
+  stats.py             Decimal-only order statistics (step 3)
+  tools/               one module per tool (step 3)
+  validation/          YAML, schema, standard and semantic checks; cyber-loss-validate
+  data/incidents/      one YAML record per incident, named <id>.yaml
+  schemas/             domain schemas (JSON Schema 2020-12)
+  standards/           YAML Markup Standard 2.0.0 (pinned by SHA-256) and the profiles
 logs/
   unverified.yaml      append-only, never packaged
-  corrections.yaml     append-only, packaged
-tools/validate.py      CI validator: schema, standard, semantic checks
+  corrections.yaml     append-only
 tests/
 docs/
 ```
+
+Schemas and standards sit inside the package, so the installed server validates
+against exactly the files CI used. Aggregate (IC3) records and their schema arrive with
+the first IC3 data.
 
 The server reads only `cyber_loss_mcp/data`, through `importlib.resources`. It never
 builds a path from a tool argument.
@@ -112,74 +111,24 @@ builds a path from a tool argument.
 
 ### 4.2 Incident record
 
-All values below are **illustrative placeholders**, not real figures.
+The complete shape is `schemas/incident.schema.json`. A fictional, valid example is
+`tests/fixtures/inc-2024-example-manufacturing.yaml`; it is kept as a test fixture so that
+the example can never drift from the schema. In outline:
 
-```yaml
-title: Example Manufacturing ransomware incident, 2024
-id: inc-2024-example-manufacturing
-updated: '2026-11-02'
-standard: '2.0.0'
-profile: ../../../standards/<profile file>.yaml
-inline_markup: none
-meta:
-  record_schema: '1.0.0'
-
-incident:
-  organisation: Example Manufacturing Inc.
-  organisation_kind: public_company       # public_company | private_company | public_body | non_profit
-  country: US                             # ISO 3166-1 alpha-2
-  sector: '31-33'                         # NAICS 2022 two-digit sector
-  sector_basis: EDGAR SIC 3714 mapped to NAICS 31-33
-  first_disclosed: '2024-01-15'           # date of the earliest cited source
-  attack_types: [ransomware]              # controlled vocabulary, 4.5
-  attack_type_basis: >
-    The 8-K states that the company "detected ransomware that encrypted
-    certain systems".
-  attack_type_source: src-1
-  techniques:                             # optional; only where a source describes the behaviour
-  - id: T1486
-    attack_version: '<pinned ATT&CK release>'
-    basis: Source describes encryption of systems.
-    source: src-1
-  summary: >
-    One or two neutral sentences, restating only what the sources say.
-
-loss_figures:
-- id: fig-1
-  loss_type: remediation                  # 4.4
-  status: reported                        # reported | estimated, as the source itself frames it
-  amount: '12345678'                      # decimal string, whole currency units, never a float
-  qualifier: approximately                # exact | approximately | at_least | up_to
-  currency: USD                           # ISO 4217
-  as_stated: approximately $12.3 million  # verbatim from the source
-  period:
-    start: '2024-01-01'
-    end: '2024-03-31'
-    cumulative: true
-  insurance_basis: gross                  # gross | net_of_insurance | not_stated
-  source: src-2
-  locator: Form 10-Q, Part I, Item 2, page 31
-  quote: >
-    Verbatim excerpt containing the figure, at most 300 characters.
-  supersedes: null                        # id of an earlier figure this one replaces
-
-sources:
-- id: src-2
-  type: sec_filing                        # 4.3
-  publisher: Example Manufacturing Inc.
-  title: Form 10-Q for the quarter ended 31 March 2024
-  url: https://www.sec.gov/Archives/edgar/data/<cik>/<accession>/<doc>.htm
-  published: '2024-05-08'
-  retrieved: '2026-11-02'
-  sec: {form: 10-Q, cik: '0000000000', accession: '0000000000-24-000000'}
-
-verification:
-- figure: fig-1
-  checked_on: '2026-11-02'
-  method: >
-    Opened the source URL, found the figure verbatim at the locator, and
-    compared amount, currency, period and insurance basis.
-```
+- **Frontmatter:** `title`, `id`, `updated`, `standard`, `profile`, `inline_markup: none`,
+  and `meta.record_schema`.
+- **`incident`:** organisation, kind, country (ISO 3166-1 alpha-2), NAICS sector and its
+  basis, first-disclosed date, `attack_types` with their basis and source, and a neutral
+  summary.
+- **`techniques`:** optional ATT&CK IDs, each with a basis quoting the source and the
+  source ID.
+- **`loss_figures`:** each with `id`, `as_stated` (verbatim), loss type, status,
+  currency, insurance basis, source, locator, quote, and `values`. `values` holds the
+  machine-readable fields: qualifier, `amount` or `amount_low` and `amount_high` (decimal
+  strings), period, `cumulative` and `supersedes`.
+- **`sources`:** each with type, publisher, title, URL, publication and retrieval dates,
+  and for EDGAR documents the form, item, CIK and accession number.
+- **`verification`:** one entry per figure: when it was checked and how.
 
 Rules the validator enforces beyond shape:
 
@@ -212,8 +161,8 @@ Rules the validator enforces beyond shape:
 | `type` | Accepted | Hosts (initial) |
 |---|---|---|
 | `sec_filing` | 8-K Item 1.05 (and 8.01 or 7.01 where a company discloses there instead), 10-K, 10-Q, and their exhibits | `www.sec.gov` |
-| `regulator_enforcement` | SEC, FTC, HHS OCR, UK ICO, EU data protection authorities | `www.sec.gov`, `www.ftc.gov`, `www.hhs.gov`, `ico.org.uk`, `www.edpb.europa.eu` and national DPA domains, added one by one |
-| `court_record` | Filings, orders, approved settlements | Court and official settlement-administrator domains, added one by one (**Decision needed**, 10.7) |
+| `regulator_enforcement` | SEC, FTC, HHS OCR, UK ICO, EU data protection authorities, NYDFS and US state attorneys general (decision 8) | `www.sec.gov`, `www.ftc.gov`, `www.hhs.gov`, `ico.org.uk`, `www.edpb.europa.eu`, `www.dataprotection.ie`, `www.dfs.ny.gov`; other DPA and attorney-general domains added one by one |
+| `court_record` | Filings, orders, approved settlements | Court and official settlement-administrator domains, added one by one. CourtListener is not used (decision 7). |
 | `company_statement` | Statements on the company's own domain, or filed as an SEC exhibit | That company's domain, allowlisted per record |
 | `fbi_ic3_report` | IC3 annual reports, **aggregates only** | `www.ic3.gov` |
 
@@ -224,12 +173,12 @@ a figure. News may point us to a primary source, but it is never cited.
 ### 4.4 Loss types
 
 `ransom`, `remediation`, `regulatory_fine`, `settlement`, `revenue_impact`,
-`aggregate`, as specified.
+`aggregate`, as specified, plus `incident_costs_total` (decision 5).
 
 - `aggregate` is valid only in aggregate records sourced from `fbi_ic3_report`, and
   never in an incident record. The validator enforces this both ways.
-- Filings often disclose one undivided "incident-related costs" figure. That doesn't
-  fit the list cleanly (**Decision needed**, 10.5).
+- `incident_costs_total` holds an undivided "incident-related costs" figure as the
+  source gives it, rather than overstating it as `remediation`.
 
 ### 4.5 Controlled vocabularies
 
@@ -307,9 +256,8 @@ exact dataset state.
 
 ### 5.6 Personal data
 
-Records are organisation-level. Proposal for v1: record **no names of individuals**,
-even where a filing names them (**Decision needed**, 10.6). No victim or customer
-data, ever.
+Records are organisation-level. v1 records **no names of individuals**, even where a
+filing names them (decision 6). No victim or customer data, ever.
 
 ## 6. Tools
 
@@ -399,7 +347,7 @@ The same method serves `loss_statistics` and `estimate_loss_range`.
    - disclosed losses are biased upwards, because 8-K Item 1.05 applies only to
      material incidents and regulators publish only the actions they take
 6. **Thresholds.** `MIN_COMPARABLES = 5` and `MIN_N_FOR_MEDIAN = 3` are constants
-   reported by `list_sources` (**Decision needed**, 10.11).
+   reported by `list_sources` (decision 11).
 
 ## 7. Threat model
 
@@ -429,14 +377,15 @@ are:
 ## 8. Licensing
 
 - **Code:** MIT (already in the repo).
-- **Data (recommendation):** CC BY 4.0 for the compiled dataset. It covers our
+- **Data:** CC BY 4.0 for the compiled dataset, the logs, the standard and the profiles
+  (`LICENSE-DATA`; decisions 2 and 3). It covers our
   selection, structure and annotations, and the EU database right. It is compatible
   with a commercial book publisher, and attribution matches the project's ethos.
   ODbL was considered and rejected: its share-alike terms add friction for the
   books. The underlying facts are not ours to license, and source documents are not
   redistributed; we keep URLs and short verbatim quotes. UK ICO material is under
   the Open Government Licence v3.0, which needs an attribution statement in the
-  record. Data licence (**Decision needed**, 10.3).
+  record.
 
 ## 9. Test strategy
 
@@ -479,49 +428,24 @@ are:
   opens an issue if any don't. It never edits data. This is network access at CI
   time, not at query time.
 
-## 10. Decisions needed
+## 10. Decisions
 
-1. **Standard version.** You mentioned v1.0.0; the uploaded file is **2.0.0,
-   `status: candidate`**, superseding 1.1.0. I propose targeting 2.0.0 and pinning
-   its SHA-256, re-pinning when it is final.
-2. **Vendoring the standard.** CI needs it, which means publishing it in this public
-   repo under `standards/`. Is that OK, and under what licence?
-3. **Data licence.** CC BY 4.0 as recommended?
-4. **Filenames.** The standard names records `YYYYMMDD__Title_by_Author.yaml`, with
-   the date being the last substantive rewrite. A filename would then change on every
-   correction. The server addresses records by `id`, so the API is unaffected either
-   way. Options:
-   - follow the rule literally
-   - treat the dataset like book content with stable names (`incidents/<id>.yaml`)
-5. **Undivided cost figures.** Filings often give one undivided "incident-related
-   costs" figure. Options:
-   - add a loss type such as `incident_costs_total`
-   - map these figures to `remediation` with a note
+Accepted on 2026-11-06 with the proposed defaults.
 
-   I recommend adding the type, since `remediation` would overstate what the source
-   says.
-6. **Names of individuals.** None in v1, even when a filing names someone?
-7. **Court records.** PACER is paywalled. Are free official copies acceptable: court
-   websites, settlement administrators, and CourtListener's RECAP archive of PACER
-   documents? CourtListener is a faithful copy rather than the primary host.
-8. **More regulators.** Add US state attorneys general, NYDFS, DOJ and the UK FCA as
-   `regulator_enforcement` sources? Several large cyber penalties come from them.
-9. **Unverified log location.** In the public repo (helps review, but republishes
-   unverified claims) or somewhere private?
-10. **Format of this doc.** Markdown here for GitHub review, with all data in YAML
-    under your standard. Or should design documents also be YAML records?
-11. **Thresholds.** 5 comparables for `estimate_loss_range`, and n ≥ 3 for a median?
-12. **Network access for step 2.** This session's network policy blocks every source
-    host:
-    - `www.sec.gov` and `efts.sec.gov`
-    - `www.ftc.gov`
-    - `www.hhs.gov`
-    - `ico.org.uk`
-    - `www.ic3.gov`
-
-    Until they're allowed, I can't open a single source, and I won't enter figures
-    I haven't checked. SEC also requires a `User-Agent` with a contact. Which contact
-    should I use?
+| # | Decision | Outcome |
+|---|---|---|
+| 1 | Standard version | 2.0.0, pinned by SHA-256; re-pinned when it is final |
+| 2 | Vendor the standard | Yes, in `src/cyber_loss_mcp/standards/`, under CC BY 4.0 |
+| 3 | Data licence | CC BY 4.0 |
+| 4 | Filenames | Stable: `data/incidents/<id>.yaml` |
+| 5 | Undivided cost figures | New loss type `incident_costs_total` |
+| 6 | Names of individuals | None in v1 |
+| 7 | Court records | Official court and settlement-administrator sites only; no CourtListener |
+| 8 | More regulators | Add NYDFS and US state attorneys general; DOJ and FCA later |
+| 9 | Unverified log | In the repo, never packaged or served |
+| 10 | Design doc format | Markdown |
+| 11 | Thresholds | 5 comparables; median from n ≥ 3 |
+| 12 | Network access and SEC contact | Open; see the step 2 pull request |
 
 ### Issues found in the standard
 
@@ -535,4 +459,7 @@ These are for your own tracking; none blocks this project.
   into `fields` entries or table rows. The dataset profile will therefore render each
   figure as a heading plus templated prose lines (for example
   `Amount: {as_stated}`). A `fields` entry template in v2.1 would make this cleaner.
-- **The filename date changes when records are rewritten.** See decision 4.
+- **The filename date changes when records are rewritten.** Settled by decision 4.
+- **Optional fields can't be templated, and links are unavailable under
+  `inline_markup: none`.** See [VALIDATION.md](VALIDATION.md) for how the profile works
+  around both.

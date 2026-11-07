@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cyber-loss-mcp:incident:1.0.0",
+  "title": "cyber-loss-mcp incident record 1.0.0",
+  "description": "Domain schema for one incident record. The record is also a YAML Markup Standard 2.0.0 document; that schema and the semantic rules in validation/semantic.py run separately.",
+  "type": "object",
+  "required": [
+    "title",
+    "id",
+    "updated",
+    "standard",
+    "profile",
+    "inline_markup",
+    "meta",
+    "incident",
+    "techniques",
+    "loss_figures",
+    "sources",
+    "verification"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "$ref": "#/$defs/text_short"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^inc-[0-9]{4}-[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "updated": {
+      "$ref": "#/$defs/date"
+    },
+    "standard": {
+      "const": "2.0.0"
+    },
+    "profile": {
+      "const": "../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml"
+    },
+    "inline_markup": {
+      "const": "none"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "record_schema"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "record_schema": {
+          "const": "1.0.0"
+        }
+      }
+    },
+    "incident": {
+      "type": "object",
+      "required": [
+        "organisation",
+        "organisation_kind",
+        "country",
+        "sector",
+        "sector_basis",
+        "first_disclosed",
+        "attack_types",
+        "attack_type_basis",
+        "attack_type_source",
+        "summary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "organisation": {
+          "$ref": "#/$defs/text_short"
+        },
+        "organisation_kind": {
+          "enum": [
+            "public_company",
+            "private_company",
+            "public_body",
+            "non_profit"
+          ]
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "sector": {
+          "enum": [
+            "11",
+            "21",
+            "22",
+            "23",
+            "31-33",
+            "42",
+            "44-45",
+            "48-49",
+            "51",
+            "52",
+            "53",
+            "54",
+            "55",
+            "56",
+            "61",
+            "62",
+            "71",
+            "72",
+            "81",
+            "92"
+          ]
+        },
+        "sector_basis": {
+          "$ref": "#/$defs/text_short"
+        },
+        "first_disclosed": {
+          "$ref": "#/$defs/date"
+        },
+        "attack_type_basis": {
+          "$ref": "#/$defs/text_long"
+        },
+        "attack_type_source": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "summary": {
+          "$ref": "#/$defs/text_long"
+        },
+        "attack_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ransomware",
+              "data_extortion",
+              "business_email_compromise",
+              "unauthorised_access",
+              "credential_compromise",
+              "supply_chain_compromise",
+              "ddos",
+              "insider",
+              "misconfiguration_exposure",
+              "not_disclosed"
+            ]
+          }
+        }
+      }
+    },
+    "techniques": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "basis",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^T[0-9]{4}(\\.[0-9]{3})?$"
+          },
+          "basis": {
+            "$ref": "#/$defs/text_long"
+          },
+          "source": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "loss_figures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "as_stated",
+          "loss_type",
+          "status",
+          "currency",
+          "insurance_basis",
+          "source",
+          "locator",
+          "quote",
+          "values"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^fig-[1-9][0-9]*$"
+          },
+          "as_stated": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "loss_type": {
+            "enum": [
+              "ransom",
+              "remediation",
+              "regulatory_fine",
+              "settlement",
+              "revenue_impact",
+              "incident_costs_total"
+            ]
+          },
+          "status": {
+            "enum": [
+              "reported",
+              "estimated"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "insurance_basis": {
+            "enum": [
+              "gross",
+              "net_of_insurance",
+              "not_stated"
+            ]
+          },
+          "source": {
+            "$ref": "#/$defs/source_ref"
+          },
+          "locator": {
+            "$ref": "#/$defs/text_short"
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "values": {
+            "type": "object",
+            "required": [
+              "qualifier",
+              "period_end",
+              "cumulative"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "qualifier": {
+                "enum": [
+                  "exact",
+                  "approximately",
+                  "at_least",
+                  "up_to"
+                ]
+              },
+              "amount": {
+                "$ref": "#/$defs/amount"
+              },
+              "amount_low": {
+                "$ref": "#/$defs/amount"
+              },
+              "amount_high": {
+                "$ref": "#/$defs/amount"
+              },
+              "period_start": {
+                "$ref": "#/$defs/date"
+              },
+              "period_end": {
+                "$ref": "#/$defs/date"
+              },
+              "cumulative": {
+                "type": "boolean"
+              },
+              "supersedes": {
+                "type": "string",
+                "pattern": "^fig-[1-9][0-9]*$"
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "amount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "amount_low"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "amount_high"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "amount_low",
+                  "amount_high"
+                ],
+                "not": {
+                  "required": [
+                    "amount"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "publisher",
+          "title",
+          "url",
+          "published",
+          "retrieved"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^src-[1-9][0-9]*$"
+          },
+          "type": {
+            "enum": [
+              "sec_filing",
+              "regulator_enforcement",
+              "court_record",
+              "company_statement"
+            ]
+          },
+          "publisher": {
+            "$ref": "#/$defs/text_short"
+          },
+          "title": {
+            "$ref": "#/$defs/text_short"
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://",
+            "maxLength": 500
+          },
+          "published": {
+            "$ref": "#/$defs/date"
+          },
+          "retrieved": {
+            "$ref": "#/$defs/date"
+          },
+          "sec": {
+            "type": "object",
+            "required": [
+              "form",
+              "cik",
+              "accession"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "form": {
+                "enum": [
+                  "8-K",
+                  "8-K/A",
+                  "10-K",
+                  "10-K/A",
+                  "10-Q",
+                  "10-Q/A",
+                  "20-F",
+                  "6-K"
+                ]
+              },
+              "item": {
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]{2}$"
+              },
+              "cik": {
+                "type": "string",
+                "pattern": "^[0-9]{10}$"
+              },
+              "accession": {
+                "type": "string",
+                "pattern": "^[0-9]{10}-[0-9]{2}-[0-9]{6}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "figure",
+          "checked_on",
+          "method"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "figure": {
+            "type": "string",
+            "pattern": "^fig-[1-9][0-9]*$"
+          },
+          "checked_on": {
+            "$ref": "#/$defs/date"
+          },
+          "method": {
+            "$ref": "#/$defs/text_long"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "format": "date"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]{1,2})?$",
+      "maxLength": 20
+    },
+    "source_ref": {
+      "type": "string",
+      "pattern": "^src-[1-9][0-9]*$"
+    },
+    "text_short": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "text_long": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    }
+  }
+}

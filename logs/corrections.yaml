@@ -1,0 +1,12 @@
+title: Corrections log
+id: corrections-log
+updated: '2026-11-06'
+standard: '2.0.0'
+profile: ../src/cyber_loss_mcp/standards/20261106__Cyber_Loss_Corrections_Log_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+description: >
+  Corrections to figures already published in the dataset. Append-only: a past entry is never edited, and a change is a new entry
+  naming the entry it supersedes.
+meta:
+  log_schema: '1.0.0'
+entries: []

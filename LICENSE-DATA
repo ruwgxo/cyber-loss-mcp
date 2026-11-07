@@ -1,0 +1,24 @@
+Dataset licence
+
+The cyber-loss-mcp dataset is licensed under the Creative Commons Attribution 4.0
+International licence (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/legalcode
+
+SPDX-License-Identifier: CC-BY-4.0
+Copyright (c) 2026 Raghav Dinesh
+
+This covers:
+- the incident records in src/cyber_loss_mcp/data/
+- the logs in logs/
+- the YAML Markup Standard and the profiles in src/cyber_loss_mcp/standards/
+
+The code is licensed separately under the MIT License (see LICENSE).
+
+Attribution: "cyber-loss-mcp dataset by Raghav Dinesh, CC BY 4.0", with a link to
+https://github.com/ruwgxo/cyber-loss-mcp and the dataset version you used.
+
+The licence covers the selection, structure and annotation of the data. It does not
+cover the underlying facts, which are not ours to license, or the cited source
+documents, which belong to their publishers and are not redistributed here. Records
+quote short excerpts from those documents only to show where each figure comes from.
+Material from the UK Information Commissioner's Office is used under the Open
+Government Licence v3.0, and any record citing it says so.

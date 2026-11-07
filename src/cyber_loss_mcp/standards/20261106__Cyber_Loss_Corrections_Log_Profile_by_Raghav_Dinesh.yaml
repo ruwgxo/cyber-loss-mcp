@@ -1,0 +1,18 @@
+record: PROFILE
+title: Cyber Loss Corrections Log Profile
+updated: '2026-11-06'
+standard: '2.0.0'
+authors:
+- Raghav Dinesh
+description: >
+  Maps the append-only log of corrections to published figures onto YAML Markup
+  Standard 2.0.0 blocks.
+maps:
+  entries[]:
+  - {block: heading, level: 2, id: '{id}', text: '{incident} {figure}: {field}'}
+  - block: prose
+    text: >-
+      Corrected {date} in dataset version {dataset_version}. Was: {old_value}. Now:
+      {new_value}. Reported in: {reported_in}. Evidence: {evidence}. Supersedes:
+      {supersedes}.
+unmapped: error

@@ -1,0 +1,17 @@
+record: PROFILE
+title: Cyber Loss Unverified Log Profile
+updated: '2026-11-06'
+standard: '2.0.0'
+authors:
+- Raghav Dinesh
+description: >
+  Maps the append-only log of figures that could not be verified onto YAML Markup
+  Standard 2.0.0 blocks.
+maps:
+  entries[]:
+  - {block: heading, level: 2, id: '{id}', text: '{organisation}: {claim}'}
+  - block: prose
+    text: >-
+      Logged {date}. Seen in: {seen_in}. Not included because: {reason}. Status:
+      {status}. Supersedes: {supersedes}.
+unmapped: error

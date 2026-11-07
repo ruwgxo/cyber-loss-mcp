@@ -1,0 +1,2115 @@
+record: YAML_MARKUP_STANDARD
+title: YAML Markup Standard
+version: 2.0.0
+updated: '2026-10-16'
+status: candidate
+supersedes: 1.1.0
+authors:
+- Raghav Dinesh
+purpose: |
+  A formatting vocabulary for YAML, parallel to what markdown provides for plain text. YAML is the authoring format across all books and records. This defines the block types, document shapes and book assembly rules a renderer needs to turn any conforming source into a readable PDF, ebook, web page or spoken text without guessing at intent.
+principle: |
+  Markdown encodes formatting in punctuation. YAML encodes it in keys. Every markdown construct gets a YAML equivalent here, plus the constructs markdown lacks that technical writing actually needs.
+principle_no_guessing: |
+  A renderer never decides what the author meant. Everything it needs is written in the source: what is metadata, what the reader sees, what each heading says, what order the files go in, and what a block becomes where it cannot be shown. Where the source is silent, this standard gives the default. Where the source breaks a rule, validation fails with a reason. Nothing degrades silently.
+inline:
+  bold: '**text**'
+  italic: '*text*'
+  bold_italic: '***text***'
+  code: '`text`'
+  strikethrough: ~~text~~
+  link: '[label](url)'
+  reference: '[label](#id) or [label](document_id#id), and an empty label [](#id) asks the renderer to
+    write the label'
+  footnote_ref: '[^1]'
+  math_inline: $expr$
+  superscript: ^text^
+  subscript: ~text~
+  keyboard: '[[Ctrl+C]]'
+  highlight: ==text==
+  rules:
+  - bold marks the one scannable thing in a line, never a whole sentence
+  - code marks anything literal that must not be reflowed or smart-quoted
+  - never a bare URL in prose, always a link with a label
+  parsing_boundary:
+    parsed_in: |
+      Reader-facing text only: prose and lead text, heading text, list items, table cells, fields subjects and values, definition terms and descriptions, callout titles and text, quote text, captions, step titles and details, footnote text, and alt text.
+    never_parsed_in: |
+      Code block text, diagram source, math source, ids, references' targets, file paths and src values, lang and variant values, and every structural attribute. These are always literal.
+  escaping: |
+    A backslash before a markup character makes it literal: \* \_ \~ \^ \$ \= \[ \] \` and \\ for a backslash itself. Inside backticks nothing is parsed, so `a ~ b` needs no escape.
+  document_switch: |
+    The frontmatter key inline_markup takes markdown (the default) or none. With none, reader text is shown exactly as written and no markup is parsed. This is for text written before a source adopted this standard, where ~87% or w^T x would otherwise be misread.
+scalars:
+  folded:
+    syntax: 'key: >'
+    meaning: |
+      Prose. Line breaks in the source are authoring artifacts and the renderer joins them. A blank line inside a folded scalar is a paragraph break.
+    use_for: all narrative text, descriptions, summaries
+  literal:
+    syntax: 'key: |'
+    meaning: line breaks carry meaning. Renderer preserves them exactly.
+    use_for: code, diagram source, math source, poetry, addresses, deliberately broken lines
+  plain:
+    syntax: 'key: text'
+    use_for: short single-line values
+  rule: |
+    Prose authored with | is the number one cause of broken rendering, because the 80-column wraps a writer adds for editing comfort reach the reader as hard line breaks mid-sentence. If it is a paragraph, it is >. No exceptions.
+  apostrophes: |
+    Inside a block scalar (> or |) an apostrophe is written once: model's. The doubled form model''s is the escape for single-quoted scalars only. In a block scalar it is two literal characters and renders as two.
+  rendering: >-
+    Block type determines interpretation after YAML parsing. prose/lead text splits on each parsed newline
+    into paragraphs, discarding empty paragraphs; ordinary source wrapping folded by YAML creates spaces.
+    For literal blocks preserve parsed newlines. Authors use separate prose blocks when paragraph grouping
+    would otherwise be ambiguous.
+  source_validation: >-
+    Use a YAML parser retaining scalar styles or a separate token pass to enforce > for multiline narrative
+    and | for multiline code/diagram/math. Ordinary loaded strings alone cannot prove scalar-style conformance.
+    Single-line quoted or plain text is permitted.
+attributes:
+  id: |
+    Anchor for references. Lowercase letters, digits, hyphen and underscore, starting with a letter or digit. Unique within its document.
+  visibility: |
+    reader (the default), author or internal. See VISIBILITY.
+  alt: |
+    Text that stands in for the block where it cannot be shown, such as speech, plain text or a failed image. Required on figure and diagram, recommended on math, code and table.
+  numbered: Optional boolean; defaults are specified in headings_and_numbering.defaults.
+  page_break_before: pagination hint, see PAGINATION
+  keep_with_next: pagination hint, see PAGINATION
+  keep_together: pagination hint, see PAGINATION
+  unknown_attributes: >-
+    Strict builds reject unknown attributes. Compatibility builds retain them in memory, ignore them for
+    presentation, and log a warning; schema validation runs on a normalised copy with those attributes
+    removed.
+blocks:
+  heading:
+    yaml:
+      type: heading
+      level: 1-6
+      text: string
+      id: optional-anchor
+    renders: h1 through h6
+    note: >-
+      Levels are document-relative. The renderer generates level 1 from title; body headings start at
+      level 2. Standalone body headings may use levels 2 through 6; assembled headings beyond level 6
+      are invalid. Heading text excludes generated numbers.
+  prose:
+    yaml:
+      type: prose
+      text: '> folded scalar'
+    renders: paragraph, or several when the folded text contains blank lines
+  lead:
+    yaml:
+      type: lead
+      text: string
+    renders: opening paragraph at larger size, visually distinct from body prose
+    use_for: the first paragraph of a chapter or section
+  list:
+    yaml:
+      type: list
+      style: bullet|ordered|task
+      items:
+      - string or nested list
+    renders: ul, ol, or checkbox list
+    note: two levels of nesting maximum. Deeper means it should be headings.
+  definition:
+    yaml:
+      type: definition
+      items:
+      - term: string
+        description: string
+    renders: term in bold or heading weight, description indented beneath
+    use_for: |
+      Glossaries, component breakdowns, parameter references, anything shaped as "name plus explanation".
+  fields:
+    yaml:
+      type: fields
+      subject: string
+      entries:
+      - label: string
+        value: string or list of strings
+    renders: |
+      Subject as a heading, then each label as a consistent small-caps or bold label with its value beneath. A list value renders as a bullet list under its label. Every entry renders its label, always.
+    use_for: |
+      Repeated structures where each instance has the same field set - a component with purpose, example, and security note; a finding with severity, evidence, and fix.
+  table:
+    yaml:
+      type: table
+      columns:
+      - string
+      rows:
+      - - cell
+      align: optional, per column, left|center|right
+      widths: optional, per column, relative numbers such as [1, 3, 2]
+      caption: optional
+    renders: table
+    rules:
+    - Every row has exactly as many cells as there are columns. A mismatch fails validation.
+    - Only when columns genuinely align across every row. Do not force prose into a table.
+    long_tables: see TABLES
+  quote:
+    yaml:
+      type: quote
+      text: string
+      attribution: optional
+      source: optional
+    renders: blockquote with attribution line
+    use_for: directly quoted external content only, never general emphasis
+  callout:
+    yaml:
+      type: callout
+      variant: note|tip|warning|danger|security|example
+      title: optional
+      text: string
+    renders: bounded box, colour and icon per variant
+    use_for: |
+      Content that interrupts the flow deliberately. Security notes in a technical book are the main case.
+  code:
+    yaml:
+      type: code
+      lang: string
+      text: '| literal scalar'
+      filename: optional, the file name this code is saved as
+      caption: optional, a description shown with the block
+      line_numbers: optional, default false (true when highlight_lines is set)
+      start_line: optional, default 1
+      highlight_lines: optional, [integer]
+      runnable: optional, true when the block is meant to execute as written
+    renders: fenced block with syntax highlighting
+    behaviour: see CODE
+  math:
+    yaml:
+      type: math
+      tex: '| literal LaTeX source'
+      alt: recommended
+      numbered: optional
+    renders: |
+      Display formula. MathML or rendered TeX where the target supports it, an image otherwise, alt in speech and plain text.
+    use_for: a formula on its own line. Never write display math as prose or as a text code block.
+  figure:
+    yaml:
+      type: figure
+      src: path relative to the source file
+      sources: 'optional mapping of format to path, such as {svg: a.svg, png: a.png}'
+      alt: string, required
+      caption: optional
+      width: optional, fraction of text width from 0.1 to 1.0
+    renders: image with caption
+    behaviour: see FIGURES
+  diagram:
+    yaml:
+      type: diagram
+      notation: mermaid|graphviz|plantuml|ascii
+      text: '| literal diagram source'
+      alt: string, required
+      caption: optional
+      fallback: optional, path to a pre-rendered image
+    renders: the diagram drawn from its source, numbered like a figure
+    behaviour: see FIGURES
+  steps:
+    yaml:
+      type: steps
+      items:
+      - title: string
+        detail: string
+    renders: numbered sequence with each step's title visually distinct from its detail
+    use_for: procedures where order matters and each step needs more than one line
+  comparison:
+    yaml:
+      type: comparison
+      subjects:
+      - string
+      criteria:
+      - label: string
+        values:
+        - string
+    renders: side-by-side table or column layout
+    use_for: A-versus-B analysis where the same criteria apply to each subject
+  divider:
+    yaml:
+      type: divider
+    renders: horizontal rule
+    note: between major sections only. Headings already separate content.
+  toc:
+    yaml:
+      type: toc
+      depth: integer
+    renders: generated table of contents from headings
+  footnotes:
+    yaml:
+      type: footnotes
+      items:
+      - id: string
+        text: string
+    renders: numbered notes at document end, linked from inline refs
+document:
+  frontmatter:
+    where: top-level keys of the document
+    required:
+    - title
+    - updated
+    optional:
+    - subtitle
+    - status
+    - scope
+    - version
+    - tags
+    - authors
+    - language
+    - description
+    - inline_markup
+    - standard
+    - profile
+    - id
+    rule: metadata only. Never rules, instructions, or content.
+    notes:
+      standard: 'Required for new v2 sources: the quoted string "2.0.0". Version declarations are strings,
+        never floating-point numbers.'
+      profile: path to the profile that maps this document's domain keys to blocks
+      id: the document's id for cross-document references. Defaults to the filename without extension.
+  meta: |
+    One reserved top-level key for metadata the author wants stored but never shown: counts, planning dates, schema versions, notes to tooling. It can hold anything. It never renders in any target.
+  body: |
+    Either body as a sequence of blocks, or domain-specific keys that a declared profile maps onto blocks. A document with domain keys and no profile (its own or its book's) fails validation. A renderer never maps an undeclared key by guessing.
+  keys_are_not_text: |
+    A renderer never shows a key name to the reader. Every heading, label and title the reader sees is written in the source, or produced by a template in the profile. A key such as why_this_section_exists is an address, not a heading.
+  filename: >-
+    YYYYMMDD__Title_by_Author.yaml for records. Book content files may use other names, because the book
+    manifest addresses them.
+  date_meaning: last substantive rewrite, not every append
+  publication_fields: >-
+    Metadata is never dumped as content. title, subtitle and authors populate title pages or document
+    headings; language supplies output language metadata. Other metadata renders only through an explicit
+    reader-facing template. meta never renders.
+visibility:
+  reader: shown in every reader-facing output. The default.
+  author: shown only in author and review builds, marked as such. For editorial notes, open questions
+    and planning.
+  internal: never rendered. For instructions to tools and anything a reader must never see.
+  applies_to: any block, any part of a profile-mapped document, and any entry in a book manifest
+  inheritance: a container's visibility applies to everything inside it, and a child cannot raise it
+  versus_meta: |
+    meta holds data. visibility marks content. A planning paragraph is content with visibility author. A word count is meta.
+append_only_documents:
+  rule: new entries at the bottom in date order, never reorder
+  correction: |
+    A past entry is never edited. A correction is a new entry stating what changed and which entry it supersedes.
+  closing: closing something out is a closing entry, not a deletion of the history above it
+  no_changelog: |
+    The append-only history already shows what changed and when. A separate changelog block duplicates it and falls out of sync.
+book:
+  rule: |
+    A book is one manifest document with type book. It lists every file of the book in reading order. A renderer assembles the book from the manifest alone, never from filenames, directory order or heading text. A content file the manifest does not list is not part of the book, and validation warns about it.
+  yaml: |
+    type: book
+    title: AI Security Mastery
+    subtitle: From ML Fundamentals to Production Detection Systems
+    authors: [Raghav Dinesh]
+    updated: 2026-10-13
+    language: en
+    standard: "2.0.0"
+    profile: standards/20261012__AI_Security_Mastery_Book_Profile_by_Raghav_Dinesh.yaml
+    numbering:
+      parts: upper-roman
+      chapters: decimal
+      sections: chapter.decimal
+      figures: chapter.decimal
+      tables: chapter.decimal
+      equations: chapter.decimal
+    labels: {part: Part, chapter: Chapter, section: Section, figure: Figure, table: Table, equation: Equation}
+    front:
+      - {file: front/about.yaml}
+      - {file: front/planning_notes.yaml, visibility: author}
+    parts:
+      - title: Machine Learning Foundations
+        id: part-ml-foundations
+        chapters:
+          - title: Machine Learning Fundamentals
+            id: ch-ml-fundamentals
+            file: book/chapter_01_index.yaml
+            sections:
+              - book/section_01_01_what_is_ml.yaml
+              - book/section_01_02_linear_algebra.yaml
+    appendices:
+      - {file: back/glossary.yaml}
+    back:
+      - {file: back/resources.yaml}
+  entries: >-
+    Front/back/section entries are paths or file mappings. Chapters are mappings with title or file and
+    optional sections; parts require title and chapters. A file-backed chapter inherits its source title
+    if omitted. Fileless chapter/part titles generate headings. Paths are relative to manifest; figures
+    remain relative to their content file.
+  divisions: front, parts, appendices and back, in that order. A book without parts lists chapters directly.
+headings_and_numbering:
+  relative_levels: |
+    Each document's headings are relative to that document. When a book is assembled, every level shifts by the document's depth in the manifest: the book title is level 1, parts level 2, chapters level 3, sections level 4, a section's own level 2 headings become level 5. A book without parts shifts one less. A heading pushed beyond level 6 fails validation.
+  numbers_are_generated: |
+    Titles never carry their own numbers. Part, chapter, section, figure, table, equation and code numbers come from the manifest's numbering rules and labels, and the renderer prefixes them (Chapter 10, Section 10.3, Figure 10.2). A block opts out with numbered: false. Legacy titles that already contain a number set numbered: false until they are cleaned, so a number is never printed twice.
+  formats: decimal, upper-roman, lower-roman, upper-alpha, lower-alpha, chapter.decimal, none
+  defaults:
+    parts: upper-roman
+    chapters: decimal
+    sections: chapter.decimal
+    figures: chapter.decimal
+    tables: chapter.decimal
+    equations: none
+    code: none
+    appendices: upper-alpha
+    numbered: >-
+      Part, chapter and section divisions default true. Figures, diagrams and tables default true only
+      with a nonempty caption. Equations and code default false. Other block types are unnumbered; body
+      heading counters are independent within their document.
+  counters: >-
+    Chapter numbers continue across parts. Section counters reset each chapter. Figures and diagrams share
+    a counter; table, equation and code counters are separate and reset each chapter for chapter.decimal.
+    Only reader-visible numbered content increments counters in a reader build. Appendices use A, B, ...
+    with A.1 section/figure/table numbers. Front and back matter are unnumbered unless explicitly configured;
+    chapter.decimal there is invalid. Unnumbered blocks do not increment counters.
+references:
+  addresses: |
+    A document is addressed by its id. A block, part or heading inside it is addressed by document_id#block_id. Within the same document, #block_id is enough. Ids are unique within their document, so v1-style ids such as part_1 stay valid.
+  syntax: >-
+    Internal references use #block_id, document_id#block_id, or @document_id for a whole document. External/file
+    links require a URI scheme, ./, ../, or an absolute path. Bare document IDs are not internal references.
+  generated_labels: >-
+    [](#fig-squeezer) requests Figure 10.4; [](@section_10_04_pgd_attack) requests the section label.
+    An unnumbered target uses its title or caption; when neither exists, require a nonempty explicit link
+    label.
+  per_target:
+    pdf: label plus page number (Figure 10.4 on page 212) and a clickable link
+    html: hyperlink
+    epub: hyperlink
+    docx: cross-reference field
+    markdown: relative link
+    speech: label only, never page numbers
+    plain_text: label only
+  rule: a reference that does not resolve fails validation
+  id_precedence: >-
+    Manifest entry id overrides source document id for book assembly; source id remains an alias only
+    when unambiguous. Duplicate canonical document IDs or aliases fail validation. Manifest title overrides
+    source title for the generated heading; never render both.
+pagination:
+  hints:
+    page_break_before: start the block on a new page
+    keep_with_next: never end a page between this block and the next
+    keep_together: never split this block across pages
+  defaults:
+    part_and_chapter: page_break_before true
+    heading: keep_with_next true
+    code: keep_together true up to 15 lines
+    table: keep_together true up to 10 rows
+    callout, fields, figure, diagram, math: keep_together true
+    paragraphs: at least 2 lines at the bottom and top of a page
+  rule: |
+    Hints are requests. A block taller than a page splits anyway, with the marks set out in CODE and TABLES. A renderer never shrinks, crops or drops content to honour a hint.
+  epub: >-
+    page_break_before requests an EPUB section boundary. Keep filenames and fragment IDs stable; honour
+    keep_with_next and keep_together only where supported and do not promise physical page placement.
+code:
+  exactness: Code text renders exactly as authored. Never reflowed, smart-quoted, trimmed or truncated.
+  filename_and_caption: filename renders as a header bar above the block, caption beneath it. Both are
+    optional.
+  line_numbers: off by default. On when line_numbers is true or highlight_lines is set. Numbering starts
+    at start_line.
+  overflow:
+    print: |
+      A line wider than the page wraps, and every wrapped continuation is marked with a visible continuation glyph (↪) so the reader knows it is one source line. Silent wrapping is not allowed.
+    screen_and_epub: >-
+      Prefer non-wrapping code in a horizontal scroll container. If the reading system cannot scroll,
+      provide a linked full listing plus a visibly marked wrapped view; preserve source text in the package.
+    speech: >-
+      the block is skipped and its alt is read. With no alt, the renderer says that a code listing is
+      skipped, naming the filename or lang.
+  splitting: |
+    Blocks over 15 lines may split across pages unless keep_together is true. A split block repeats the filename header with a continued marker on the next page.
+  tabs: a tab displays as 4 columns. The source keeps the tab.
+  runnable: |
+    runnable true marks a block a test harness may execute. It changes nothing in rendering.
+tables:
+  header_rows: >-
+    Exactly one header row, supplied by columns and repeated on each page. rows contains data only. Multiple
+    header rows are outside v2 scope; header_rows is not an accepted attribute.
+  widths: relative hints. A renderer keeps their proportions and may widen columns to fit the longest
+    word.
+  splitting: a table splits between rows. A single row never splits unless it alone is taller than a page.
+  too_wide:
+    pdf_and_docx: >-
+      the table moves to a landscape page; if it still does not fit, the font shrinks to no less than
+      7 points; if it still does not fit, validation warns and the table renders as fields per row
+    html_and_epub: HTML uses a scroll container. EPUB follows targets.epub.table, including labelled-row
+      fallback.
+    speech: every row is read as its column labels with their values, and alt is read first when set
+    plain_text: one fields block per row
+  caption: renders above the table, numbered per the manifest when the table is numbered
+figures:
+  paths: src, sources and fallback are relative to the file that contains the block. A missing file fails
+    validation.
+  formats: |
+    With sources, each target takes the best format it supports: svg for html and epub, pdf or svg for pdf, png everywhere else.
+  size: width is a fraction of the text width. Without it, the image renders at its natural size, never
+    wider than the text.
+  numbering: figures and diagrams share one counter, per the manifest
+  diagram_rendering: |
+    The renderer draws the diagram from its notation at build time. If it cannot, it uses fallback. If there is no fallback, it shows the source as a literal block with alt beneath it and warns. ascii diagrams are always shown as literal monospace text.
+  speech: alt is read, followed by the caption
+profiles:
+  rule: |
+    A profile is a record that maps a family of documents' domain keys onto blocks. It is data a renderer executes, not prose a person interprets. A new book with its own keys needs a new profile, never new renderer code.
+  yaml: |
+    record: PROFILE
+    title: Example Book Profile
+    updated: 2026-10-13
+    standard: "2.0.0"
+    maps:
+      lead:
+        - {block: lead, from: lead}
+      deliverables[]:
+        - {block: heading, level: 3, text: '{heading}', id: '{id}'}
+        - {block: prose, from: description}
+        - {block: code, lang: '{lang}', filename: '{filename}', from: code}
+      next:
+        - {block: callout, variant: note, title: 'Next: {title}', from: summary}
+      section_info:
+        - {visibility: internal}
+    unmapped: error
+  paths: a key path, with [] marking every item of a list and * marking every key of a mapping
+  templates: '{field} is replaced by that field of the matched item. A missing field fails validation.'
+  from: the field whose value becomes the block's text, items, rows or entries
+  unmapped: |
+    error (the default) fails validation on any key the profile does not map. warn renders it by the unknown-block fallback with a warning. ignore is not allowed.
+  grammar:
+    path: >-
+      Segments are literal mapping keys separated by dots. Segment key[] iterates a list, and * iterates
+      mapping values in source order. Keys containing dots, brackets or * are unsupported in profile paths;
+      rename or normalise them explicitly. No recursive wildcards or expressions.
+    evaluation: >-
+      Process maps entries in profile source order; within each match, process list items or mapping values
+      in source order; emit templates in their listed order. Overlapping source matches fail validation.
+      Reserve frontmatter and meta before mapping; they need no maps entries.
+    context: >-
+      Each matched item is the context. from and {field} paths are relative to that item. Nested literal
+      paths use dots. Templates permit scalar substitutions only; {{ and }} produce literal braces. Missing
+      fields fail. No evaluation, functions, executable expressions or implicit parent lookup.
+    from_destination:
+      prose: text
+      lead: text
+      quote: text
+      callout: text
+      code: text
+      diagram: text
+      math: tex
+      heading: text
+      list: items
+      steps: items
+      definition: items
+      footnotes: items
+      table: rows
+      fields: entries
+      comparison: criteria
+    assignment: >-
+      Explicit template attributes take precedence only when from is absent for that destination. Assigning
+      both from and an explicit value to the same destination fails. Structured from values preserve their
+      types and must pass the output block schema.
+    visibility_only: >-
+      A template with only visibility consumes the matched subtree without emitting a block; internal
+      and author restrictions cannot be loosened by descendants.
+    coverage: >-
+      A mapped subtree is consumed only by explicitly referenced fields or a visibility-only template.
+      Unreferenced child fields are unmapped errors unless explicitly handled by another nonoverlapping
+      path.
+    requirements: >-
+      Validation must check path resolution, consumption, template output types, reference resolution
+      and visibility; schema validation alone does not implement these semantics.
+fallback:
+  unknown_block: >-
+    Strict mode rejects unknown types. Compatibility mode emits alt if supplied; otherwise renders reader-facing
+    strings as paragraphs, arrays as lists and mappings as labelled fields, skipping structural keys and
+    enforcing visibility recursively. This is an explicit diagnostic fallback exception to keys_are_not_text.
+    Report every fallback with its path.
+  unknown_attribute: >-
+    Strict mode: validation error. Compatibility mode: ignored for rendering, retained in original input,
+    and reported with path.
+  unsupported_in_target: the per-target mapping below decides. Every degradation is logged in the build
+    report.
+  build_report: >-
+    Every build reports validation mode, source and target versions, warnings, degraded blocks, skipped
+    paths and reasons. An empty diagnostics list means no known omissions or degradations were detected;
+    it is not proof of lossless conversion.
+hierarchy:
+  rule: |
+    Nesting depth must be visible without reading the content. Each level needs at least two of - size, weight, colour, indentation - differing from its parent. Three structural levels need three visibly distinct treatments.
+  test: |
+    View the rendered page at 30% zoom or squint at it. The hierarchy should still read as shape. If every label looks like a peer of every other label, the treatment has collapsed and the reader has to reconstruct nesting from meaning alone.
+targets:
+  markdown:
+    native:
+    - heading
+    - prose
+    - list
+    - table
+    - quote
+    - code
+    - figure
+    - divider
+    lead: normal paragraph, or italic if emphasis matters
+    definition: bold term, then the description indented beneath
+    fields: bold subject, then each label in bold with its value on the following line
+    callout: GitHub alert syntax, or a blockquote with a bold variant prefix
+    steps: ordered list with bold titles
+    comparison: table with subjects as columns
+    math: a $$ fenced block of the tex source
+    diagram: a fenced block in its notation, then the fallback image if one exists
+    toc: list of links to headings
+    footnotes: markdown footnotes
+  html:
+    rule: full fidelity. Every block renders natively with a CSS class per type, and math renders as MathML.
+  pdf:
+    rule: |
+      Full fidelity through HTML plus a print stylesheet, or a direct typesetter. Pagination hints, repeating table headers, code continuation marks, page-numbered references, and bookmarks for every heading down to the section level.
+    toc: generated with page numbers
+  docx:
+    heading: Word heading styles 1 to 6, so the navigation pane works
+    prose_list_quote: native paragraph, list and quote styles
+    table: native table with the header row set to repeat
+    code: monospace paragraph style with shading, never wrapped without a continuation mark
+    callout: single-cell shaded table with the variant as a bold title
+    fields_definition_steps: styled paragraphs that keep labels bold
+    math: native equation when converted from tex, otherwise an image with alt
+    figure_diagram: inline image with a caption field
+    references: cross-reference fields
+  epub:
+    rule: EPUB 3. Reading order from the manifest. A new XHTML file at every page_break_before. Navigation
+      from headings.
+    table: >-
+      Prefer horizontal scrolling. If unsupported, render each row as labelled fields in reading order
+      and report the fallback.
+    code: >-
+      Prefer non-wrapping code in a horizontal scroll container. If the reading system cannot scroll,
+      provide a linked full listing plus a visibly marked wrapped view; preserve source text in the package.
+    math: MathML with alt text
+    figure_diagram: svg where supplied, png otherwise, alt always set
+  speech:
+    rule: |
+      Text only, in reading order, tuned for text-to-speech. No page numbers, running headers or footers. Headings are read as headings, with a pause after.
+    heading: its generated number and its text
+    list: items read in order, with ordered lists numbered aloud
+    table: alt, then each row as column label and value pairs
+    code: alt, or a one-line notice that a listing is skipped
+    math: alt, or the tex source when there is no alt
+    figure_diagram: alt, then caption
+    callout: the variant and title, then the text
+    fields: subject, then each label and value
+    inline_markup: removed. Links read their label only.
+  plain_text:
+    rule: all markup stripped. Hierarchy carried by indentation and blank lines.
+    table: one fields-style block per row
+    code: kept verbatim, indented four spaces
+  slack:
+    rule: |
+      Slack mrkdwn is a reduced set - bold, italic, strike, code, blockquote, lists. Headings degrade to bold. Tables degrade to code blocks or field-per-line. Callouts degrade to a blockquote with a bold variant prefix. Accept the loss, do not invent syntax Slack will render literally.
+validation:
+  schema: >-
+    The embedded JSON Schema checks normalised document/block shapes. YAML dates must be normalised to
+    ISO strings before JSON Schema validation. Semantic checks listed here run separately. Co-location
+    reduces drift but does not prevent it; conformance fixtures check agreement.
+  errors:
+  - frontmatter is missing title or updated
+  - a required block field is missing, or an allowed value is wrong
+  - a table row's cell count differs from its column count
+  - a reference does not resolve, or an id repeats within a document
+  - a figure, diagram or fallback path does not exist
+  - a figure or diagram has no alt
+  - a domain key is not mapped by the declared profile
+  - an assembled heading level is greater than 6
+  - prose is written as a literal (|) scalar outside code, diagram or math
+  - Strict mode encounters an unknown block or attribute
+  - A profile or manifest violates the deterministic rules
+  - 'A v2 source omits standard: "2.0.0"'
+  warnings:
+  - a content file is not listed in the book manifest
+  - a table needed to degrade to fields per row
+  - a diagram had no renderer and no fallback
+  - code, math or table has no alt and the build includes the speech target
+  - Compatibility mode ignored an unknown attribute or rendered an unknown block fallback
+  versions: >-
+    v2 is a breaking revision. Renderers dispatch by quoted source standard version. New v2 sources require
+    standard: "2.0.0". v1 sources require an explicit v1 adapter; do not silently validate or render them
+    under v2 semantics.
+  modes: >-
+    strict is the default and required for release builds. compatibility is opt-in and permits documented
+    unknown-block and unknown-attribute fallbacks, logging each normalisation before validation. All structural
+    errors, missing assets and unresolved references remain errors.
+conformance:
+- check: prose reflows
+  detail: no sentence breaks except at the right margin. Folded scalars joined, literal scalars preserved.
+- check: labels complete
+  detail: every entry in a fields block renders its label, consistently across every sibling instance
+- check: hierarchy visible
+  detail: three structural levels distinguishable at a glance
+- check: literals intact
+  detail: >-
+    inline code, code blocks, figures and filenames render exactly as authored, never reflowed, smart-quoted,
+    wrapped without a mark or truncated
+- check: empty is absent
+  detail: a key with no value renders nothing, not an empty label with blank space under it
+- check: unknown blocks degrade
+  detail: Strict mode rejects unknown types. Compatibility mode applies recursive visibility-aware fallback
+    and reports it.
+- check: inline markup honoured
+  detail: bold, code and links parse inside every reader-facing scalar and nowhere else
+- check: metadata never renders
+  detail: >-
+    Never dump metadata or meta. Render designated publication fields via title pages/headings only; author
+    content is review-only and internal content never renders.
+- check: no derived text
+  detail: >-
+    Visible labels come from source, numbering rules or profile templates. Compatibility fallback may
+    show source keys as diagnostic labels and must report that exception.
+- check: manifest order
+  detail: a book renders in exactly the order its manifest lists
+- check: numbers generated
+  detail: numbers come from the numbering rules, and no number is printed twice
+- check: references resolve
+  detail: every reference renders as a working link or label in every target
+- check: nothing silent
+  detail: every degradation, skip and fallback appears in the build report
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: urn:raghav-dinesh:yaml-markup-standard:2.0.0
+  title: YAML Markup Standard 2.0.0 schema
+  description: Structural v2 schema; normalise YAML dates to ISO strings first and run separate semantic
+    validation.
+  oneOf:
+  - $ref: '#/$defs/book'
+  - $ref: '#/$defs/profile'
+  - allOf:
+    - $ref: '#/$defs/document'
+    - not:
+        properties:
+          type:
+            const: book
+        required:
+        - type
+    - not:
+        properties:
+          record:
+            const: PROFILE
+        required:
+        - record
+  $defs:
+    id:
+      type: string
+      pattern: ^[a-z0-9][a-z0-9_-]*$
+    visibility:
+      enum:
+      - reader
+      - author
+      - internal
+    block:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          enum:
+          - heading
+          - prose
+          - lead
+          - list
+          - definition
+          - fields
+          - table
+          - quote
+          - callout
+          - code
+          - math
+          - figure
+          - diagram
+          - steps
+          - comparison
+          - divider
+          - toc
+          - footnotes
+      allOf:
+      - if:
+          properties:
+            type:
+              const: heading
+        then:
+          $ref: '#/$defs/blocks/heading'
+      - if:
+          properties:
+            type:
+              const: prose
+        then:
+          $ref: '#/$defs/blocks/prose'
+      - if:
+          properties:
+            type:
+              const: lead
+        then:
+          $ref: '#/$defs/blocks/lead'
+      - if:
+          properties:
+            type:
+              const: list
+        then:
+          $ref: '#/$defs/blocks/list'
+      - if:
+          properties:
+            type:
+              const: definition
+        then:
+          $ref: '#/$defs/blocks/definition'
+      - if:
+          properties:
+            type:
+              const: fields
+        then:
+          $ref: '#/$defs/blocks/fields'
+      - if:
+          properties:
+            type:
+              const: table
+        then:
+          $ref: '#/$defs/blocks/table'
+      - if:
+          properties:
+            type:
+              const: quote
+        then:
+          $ref: '#/$defs/blocks/quote'
+      - if:
+          properties:
+            type:
+              const: callout
+        then:
+          $ref: '#/$defs/blocks/callout'
+      - if:
+          properties:
+            type:
+              const: code
+        then:
+          $ref: '#/$defs/blocks/code'
+      - if:
+          properties:
+            type:
+              const: math
+        then:
+          $ref: '#/$defs/blocks/math'
+      - if:
+          properties:
+            type:
+              const: figure
+        then:
+          $ref: '#/$defs/blocks/figure'
+      - if:
+          properties:
+            type:
+              const: diagram
+        then:
+          $ref: '#/$defs/blocks/diagram'
+      - if:
+          properties:
+            type:
+              const: steps
+        then:
+          $ref: '#/$defs/blocks/steps'
+      - if:
+          properties:
+            type:
+              const: comparison
+        then:
+          $ref: '#/$defs/blocks/comparison'
+      - if:
+          properties:
+            type:
+              const: divider
+        then:
+          $ref: '#/$defs/blocks/divider'
+      - if:
+          properties:
+            type:
+              const: toc
+        then:
+          $ref: '#/$defs/blocks/toc'
+      - if:
+          properties:
+            type:
+              const: footnotes
+        then:
+          $ref: '#/$defs/blocks/footnotes'
+    blocks:
+      heading:
+        type: object
+        required:
+        - type
+        - level
+        - text
+        properties:
+          type:
+            const: heading
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          level:
+            type: integer
+            minimum: 2
+            maximum: 6
+          text:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      prose:
+        type: object
+        required:
+        - type
+        - text
+        properties:
+          type:
+            const: prose
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          text:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      lead:
+        type: object
+        required:
+        - type
+        - text
+        properties:
+          type:
+            const: lead
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          text:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      list:
+        type: object
+        required:
+        - type
+        - items
+        properties:
+          type:
+            const: list
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          style:
+            enum:
+            - bullet
+            - ordered
+            - task
+          items:
+            type: array
+            minItems: 1
+            items:
+              anyOf:
+              - type: string
+                minLength: 1
+              - type: array
+                minItems: 1
+                items:
+                  anyOf:
+                  - type: string
+                    minLength: 1
+                  - type: array
+                    items:
+                      type: string
+                      minLength: 1
+        additionalProperties: false
+      definition:
+        type: object
+        required:
+        - type
+        - items
+        properties:
+          type:
+            const: definition
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          items:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - term
+              - description
+              properties:
+                term:
+                  type: string
+                  minLength: 1
+                description:
+                  type: string
+                  minLength: 1
+              additionalProperties: false
+        additionalProperties: false
+      fields:
+        type: object
+        required:
+        - type
+        - subject
+        - entries
+        properties:
+          type:
+            const: fields
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          subject:
+            type: string
+            minLength: 1
+          entries:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - label
+              - value
+              properties:
+                label:
+                  type: string
+                  minLength: 1
+                value:
+                  anyOf:
+                  - type: string
+                    minLength: 1
+                  - type: number
+                  - type: array
+                    minItems: 1
+                    items:
+                      type: string
+                      minLength: 1
+              additionalProperties: false
+        additionalProperties: false
+      table:
+        type: object
+        required:
+        - type
+        - columns
+        - rows
+        properties:
+          type:
+            const: table
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          columns:
+            type: array
+            minItems: 1
+            items:
+              type:
+              - string
+              - number
+              - boolean
+          rows:
+            type: array
+            items:
+              type: array
+              items:
+                type:
+                - string
+                - number
+                - boolean
+          align:
+            type: array
+            items:
+              enum:
+              - left
+              - center
+              - right
+          widths:
+            type: array
+            items:
+              type: number
+              exclusiveMinimum: 0
+          caption:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      quote:
+        type: object
+        required:
+        - type
+        - text
+        properties:
+          type:
+            const: quote
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          text:
+            type: string
+            minLength: 1
+          attribution:
+            type: string
+            minLength: 1
+          source:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      callout:
+        type: object
+        required:
+        - type
+        - variant
+        - text
+        properties:
+          type:
+            const: callout
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          variant:
+            enum:
+            - note
+            - tip
+            - warning
+            - danger
+            - security
+            - example
+          title:
+            type: string
+            minLength: 1
+          text:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      code:
+        type: object
+        required:
+        - type
+        - lang
+        - text
+        properties:
+          type:
+            const: code
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          lang:
+            type: string
+            minLength: 1
+          text:
+            type: string
+          filename:
+            type: string
+            minLength: 1
+          caption:
+            type: string
+            minLength: 1
+          line_numbers:
+            type: boolean
+          start_line:
+            type: integer
+            minimum: 1
+          highlight_lines:
+            type: array
+            items:
+              type: integer
+              minimum: 1
+          runnable:
+            type: boolean
+        additionalProperties: false
+      math:
+        type: object
+        required:
+        - type
+        - tex
+        properties:
+          type:
+            const: math
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          tex:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      figure:
+        type: object
+        required:
+        - type
+        - src
+        - alt
+        properties:
+          type:
+            const: figure
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          src:
+            type: string
+            minLength: 1
+          sources:
+            type: object
+            additionalProperties:
+              type: string
+              minLength: 1
+          caption:
+            type: string
+            minLength: 1
+          width:
+            type: number
+            minimum: 0.1
+            maximum: 1.0
+        additionalProperties: false
+      diagram:
+        type: object
+        required:
+        - type
+        - notation
+        - text
+        - alt
+        properties:
+          type:
+            const: diagram
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          notation:
+            enum:
+            - mermaid
+            - graphviz
+            - plantuml
+            - ascii
+          text:
+            type: string
+            minLength: 1
+          caption:
+            type: string
+            minLength: 1
+          fallback:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      steps:
+        type: object
+        required:
+        - type
+        - items
+        properties:
+          type:
+            const: steps
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          items:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - title
+              - detail
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                detail:
+                  type: string
+                  minLength: 1
+              additionalProperties: false
+        additionalProperties: false
+      comparison:
+        type: object
+        required:
+        - type
+        - subjects
+        - criteria
+        properties:
+          type:
+            const: comparison
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          subjects:
+            type: array
+            minItems: 2
+            items:
+              type: string
+              minLength: 1
+          criteria:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - label
+              - values
+              properties:
+                label:
+                  type: string
+                  minLength: 1
+                values:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+              additionalProperties: false
+        additionalProperties: false
+      divider:
+        type: object
+        required:
+        - type
+        properties:
+          type:
+            const: divider
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+        additionalProperties: false
+      toc:
+        type: object
+        required:
+        - type
+        properties:
+          type:
+            const: toc
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          depth:
+            type: integer
+            minimum: 1
+            maximum: 6
+        additionalProperties: false
+      footnotes:
+        type: object
+        required:
+        - type
+        - items
+        properties:
+          type:
+            const: footnotes
+          id:
+            $ref: '#/$defs/id'
+          visibility:
+            $ref: '#/$defs/visibility'
+          alt:
+            type: string
+            minLength: 1
+          numbered:
+            type: boolean
+          page_break_before:
+            type: boolean
+          keep_with_next:
+            type: boolean
+          keep_together:
+            type: boolean
+          items:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - id
+              - text
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+                text:
+                  type: string
+                  minLength: 1
+              additionalProperties: false
+        additionalProperties: false
+    document:
+      type: object
+      required:
+      - title
+      - updated
+      - standard
+      properties:
+        title:
+          type: string
+          minLength: 1
+        updated:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          format: date
+        subtitle:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          minLength: 1
+        scope:
+          type: string
+          minLength: 1
+        version:
+          type: string
+          minLength: 1
+        tags:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        authors:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+        language:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        standard:
+          const: 2.0.0
+        profile:
+          type: string
+          minLength: 1
+        id:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        meta: {}
+        body:
+          type: array
+          items:
+            $ref: '#/$defs/block'
+        inline_markup:
+          enum:
+          - markdown
+          - none
+      additionalProperties: true
+      $comment: >-
+        Domain keys beyond the frontmatter are allowed here and checked against the declared profile by
+        the validator; body, when present, is checked block by block.
+    book:
+      type: object
+      required:
+      - type
+      - title
+      - updated
+      - standard
+      properties:
+        title:
+          type: string
+          minLength: 1
+        updated:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          format: date
+        subtitle:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          minLength: 1
+        scope:
+          type: string
+          minLength: 1
+        version:
+          type: string
+          minLength: 1
+        tags:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        authors:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+        language:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        standard:
+          const: 2.0.0
+        profile:
+          type: string
+          minLength: 1
+        id:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        meta: {}
+        type:
+          const: book
+        numbering:
+          type: object
+          properties:
+            parts:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            chapters:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            sections:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            figures:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            tables:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            equations:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            code:
+              enum:
+              - decimal
+              - upper-roman
+              - lower-roman
+              - upper-alpha
+              - lower-alpha
+              - chapter.decimal
+              - none
+            appendices:
+              enum:
+              - upper-alpha
+              - lower-alpha
+              - decimal
+              - none
+          additionalProperties: false
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+        front:
+          type: array
+          items:
+            anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  minLength: 1
+                title:
+                  type: string
+                  minLength: 1
+                id:
+                  type: string
+                  pattern: ^[a-z0-9][a-z0-9_-]*$
+                visibility:
+                  enum:
+                  - reader
+                  - author
+                  - internal
+              additionalProperties: false
+        parts:
+          type: array
+          items:
+            $ref: '#/$defs/part'
+        chapters:
+          type: array
+          items:
+            $ref: '#/$defs/chapter'
+          minItems: 1
+        appendices:
+          type: array
+          items:
+            anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  minLength: 1
+                title:
+                  type: string
+                  minLength: 1
+                id:
+                  type: string
+                  pattern: ^[a-z0-9][a-z0-9_-]*$
+                visibility:
+                  enum:
+                  - reader
+                  - author
+                  - internal
+              additionalProperties: false
+        back:
+          type: array
+          items:
+            anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  minLength: 1
+                title:
+                  type: string
+                  minLength: 1
+                id:
+                  type: string
+                  pattern: ^[a-z0-9][a-z0-9_-]*$
+                visibility:
+                  enum:
+                  - reader
+                  - author
+                  - internal
+              additionalProperties: false
+        inline_markup:
+          enum:
+          - markdown
+          - none
+      not:
+        required:
+        - parts
+        - chapters
+      additionalProperties: false
+    chapter:
+      type: object
+      required: []
+      properties:
+        title:
+          type: string
+          minLength: 1
+        id:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        file:
+          type: string
+          minLength: 1
+        visibility:
+          enum:
+          - reader
+          - author
+          - internal
+        sections:
+          type: array
+          items:
+            anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  minLength: 1
+                title:
+                  type: string
+                  minLength: 1
+                id:
+                  type: string
+                  pattern: ^[a-z0-9][a-z0-9_-]*$
+                visibility:
+                  enum:
+                  - reader
+                  - author
+                  - internal
+              additionalProperties: false
+      additionalProperties: false
+      anyOf:
+      - required:
+        - title
+      - required:
+        - file
+    part:
+      type: object
+      required:
+      - title
+      - chapters
+      properties:
+        title:
+          type: string
+          minLength: 1
+        id:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        file:
+          type: string
+          minLength: 1
+        visibility:
+          enum:
+          - reader
+          - author
+          - internal
+        chapters:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/$defs/chapter'
+      additionalProperties: false
+    profile:
+      type: object
+      required:
+      - record
+      - title
+      - updated
+      - maps
+      - standard
+      properties:
+        title:
+          type: string
+          minLength: 1
+        updated:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          format: date
+        subtitle:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          minLength: 1
+        scope:
+          type: string
+          minLength: 1
+        version:
+          type: string
+          minLength: 1
+        tags:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        authors:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+        language:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        standard:
+          const: 2.0.0
+        profile:
+          type: string
+          minLength: 1
+        id:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        meta: {}
+        record:
+          const: PROFILE
+        maps:
+          type: object
+          minProperties: 1
+          additionalProperties:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              properties:
+                block:
+                  enum:
+                  - heading
+                  - prose
+                  - lead
+                  - list
+                  - definition
+                  - fields
+                  - table
+                  - quote
+                  - callout
+                  - code
+                  - math
+                  - figure
+                  - diagram
+                  - steps
+                  - comparison
+                  - divider
+                  - toc
+                  - footnotes
+                from:
+                  type: string
+                  minLength: 1
+                visibility:
+                  enum:
+                  - reader
+                  - author
+                  - internal
+              additionalProperties: true
+        unmapped:
+          enum:
+          - error
+          - warn
+        inline_markup:
+          enum:
+          - markdown
+          - none
+      additionalProperties: true
+migration_from_v1:
+- >-
+  Flatten frontmatter into top-level metadata; move the legacy standard declaration to standard: "2.0.0".
+  Do not confuse source content version with standard version.
+- >-
+  Remove a body H1 only when it duplicates the publication title. Preserve other H1 content as an appropriately
+  levelled heading after manual review.
+- >-
+  Map domain keys with an explicit profile, or convert them into standard body blocks. Never guess labels
+  from keys in strict output.
+- Replace literal title numbering with generated numbering, or explicitly opt legacy headings out while
+  migrating.
+- Replace bare-document internal links with @document_id. Preserve external links.
+- Use columns for the single table header and rows for data. Migrate custom multirow headers explicitly.
+- Resolve each new strict validation error; migration must produce a report and must not silently discard
+  content.
+conformance_examples:
+- name: valid prose
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: prose
+      text: Hello.
+  schema_valid: true
+- name: reject duplicate title heading
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: heading
+      level: 1
+      text: Example
+  schema_valid: false
+- name: reject unknown attribute in strict mode
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: prose
+      text: Hello.
+      future_hint: true
+  schema_valid: false
+- name: reject multirow header ambiguity
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: table
+      columns:
+      - A
+      rows:
+      - - B
+      header_rows: 2
+  schema_valid: false
+- name: publication title
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    meta:
+      secret: never show
+    body:
+    - type: prose
+      text: Hello.
+  schema_valid: true
+  expected_reader_text:
+  - Example
+  - Hello.
+  forbidden_reader_text:
+  - secret
+  - never show
+  - updated
+  - 2.0.0
+- name: paragraph segmentation
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: prose
+      text: |-
+        First paragraph.
+        Second paragraph.
+  schema_valid: true
+  expected_paragraphs:
+  - First paragraph.
+  - Second paragraph.
+- name: profile mapping
+  profile_maps:
+    summary:
+    - block: prose
+      from: text
+  source:
+    summary:
+      text: Hello.
+  expected_blocks:
+  - type: prose
+    text: Hello.
+- name: table row width
+  input:
+    title: Example
+    updated: '2026-10-16'
+    standard: 2.0.0
+    body:
+    - type: table
+      columns:
+      - A
+      - B
+      rows:
+      - - one
+  schema_valid: true
+  semantic_valid: false
+  expected_error: table row width mismatch

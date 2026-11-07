@@ -1,0 +1,12 @@
+title: Unverified figures log
+id: unverified-log
+updated: '2026-11-06'
+standard: '2.0.0'
+profile: ../src/cyber_loss_mcp/standards/20261106__Cyber_Loss_Unverified_Log_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+description: >
+  Figures that could not be verified against a primary source, and so are not in the dataset. This file is never packaged or served. Append-only: a past entry is never edited, and a change is a new entry
+  naming the entry it supersedes.
+meta:
+  log_schema: '1.0.0'
+entries: []
