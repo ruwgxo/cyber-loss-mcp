@@ -1,0 +1,67 @@
+title: 23andMe credential stuffing attack, 2023
+id: inc-2023-23andme
+updated: '2026-11-16'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: 23andMe, Inc
+  organisation_kind: public_company
+  country: US
+  sector: '62'
+  sector_basis: Consumer genetic testing; sector assigned by the maintainer, not stated in the source
+  first_disclosed: '2025-06-05'
+  attack_types: [credential_compromise]
+  attack_type_basis: >
+    The penalty notice says a threat actor was able to perpetrate a credential
+    stuffing attack over the course of at least five months.
+  attack_type_source: src-1
+  summary: >
+    A threat actor ran a credential stuffing attack against 23andMe over at least
+    five months and obtained access to personal data relating to 155,592 UK-based
+    customers. The UK Information Commissioner's Office fined 23andMe under the UK
+    GDPR, after a joint investigation with the Office of the Privacy Commissioner
+    of Canada.
+
+techniques:
+- id: T1110.004
+  basis: The notice describes a credential stuffing attack.
+  source: src-1
+
+loss_figures:
+- id: fig-1
+  as_stated: £2,310,000
+  loss_type: regulatory_fine
+  status: reported
+  currency: GBP
+  insurance_basis: not_stated
+  source: src-1
+  locator: Penalty Notice, paragraph 1, printed page 3
+  quote: >
+    the Information Commissioner (the “Commissioner”) requires 23andMe, Inc
+    (“23andMe”) to pay the Commissioner a penalty of £2,310,000.
+  values:
+    qualifier: exact
+    amount: '2310000'
+    period_end: '2025-06-05'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: Information Commissioner's Office
+  title: Penalty Notice, 23andMe, Inc, 5 June 2025
+  url: https://ico.org.uk/media2/kclbljpo/23andme-penalty-notice.pdf
+  published: '2025-06-05'
+  retrieved: '2026-11-16'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-16'
+  method: >
+    Downloaded the penalty notice from ico.org.uk, found the figure in paragraph 1,
+    and confirmed amount, currency and wording against a rendered image of printed
+    page 3.
