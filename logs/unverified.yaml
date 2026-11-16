@@ -1,6 +1,6 @@
 title: Unverified figures log
 id: unverified-log
-updated: '2026-11-06'
+updated: '2026-11-16'
 standard: '2.0.0'
 profile: ../src/cyber_loss_mcp/standards/20261106__Cyber_Loss_Unverified_Log_Profile_by_Raghav_Dinesh.yaml
 inline_markup: none
@@ -9,4 +9,18 @@ description: >
   naming the entry it supersedes.
 meta:
   log_schema: '1.0.0'
-entries: []
+entries:
+- id: unv-1
+  date: '2026-11-16'
+  organisation: Marriott International Inc
+  claim: ICO penalty of £18.4 million, 30 October 2020
+  seen_in: >-
+    ICO penalty notice, paragraph 1.7, printed page 3; ICO annual report 2020-21
+  reason: >-
+    In the penalty notice, a stray glyph overlaps the decimal point of the figure,
+    both in the text layer (it extracts as £18.e4) and on the rendered page, so
+    the amount cannot be read from the notice with certainty. Held for the
+    maintainer to read the original, or for a second ICO document that states it
+    cleanly.
+  status: open
+  supersedes: none

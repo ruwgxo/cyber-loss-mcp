@@ -1,0 +1,67 @@
+title: British Airways data breach, 2018
+id: inc-2018-british-airways
+updated: '2026-11-16'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: British Airways plc
+  organisation_kind: public_company
+  country: GB
+  sector: 48-49
+  sector_basis: Air transport; sector assigned by the maintainer, not stated in the source
+  first_disclosed: '2020-10-16'
+  attack_types: [credential_compromise]
+  attack_type_basis: >
+    The penalty notice says a malicious actor gained access to an internal BA
+    application through the use of compromised credentials, traversed the network
+    and edited a JavaScript file on BA's website.
+  attack_type_source: src-1
+  summary: >
+    Between 22 June and 5 September 2018 an attacker used compromised credentials
+    to enter BA's network and altered a JavaScript file on britishairways.com. The
+    UK Information Commissioner's Office fined BA under the GDPR.
+
+techniques:
+- id: T1078
+  basis: The notice says the attacker gained access through the use of compromised credentials.
+  source: src-1
+
+loss_figures:
+- id: fig-1
+  as_stated: £20m
+  loss_type: regulatory_fine
+  status: reported
+  currency: GBP
+  insurance_basis: not_stated
+  source: src-1
+  locator: Penalty Notice, paragraph 1.7, printed page 3
+  quote: >
+    The amount of the penalty that the Commissioner has decided to impose, having
+    taken into account a range of mitigating factors set out further below and the
+    impact of the Covid-19 pandemic, is £20m.
+  values:
+    qualifier: exact
+    amount: '20000000'
+    period_end: '2020-10-16'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: Information Commissioner's Office
+  title: Penalty Notice, British Airways plc, case ref COM0783542, 16 October 2020
+  url: https://ico.org.uk/media2/migrated/2618421/ba-penalty-20201016.pdf
+  published: '2020-10-16'
+  retrieved: '2026-11-16'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-16'
+  method: >
+    Downloaded the penalty notice from ico.org.uk, found the figure in the text of
+    paragraph 1.7, and confirmed amount, currency and wording against a rendered
+    image of printed page 3.

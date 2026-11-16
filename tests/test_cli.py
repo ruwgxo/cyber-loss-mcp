@@ -24,7 +24,8 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 
 def run(repo: Path, *extra: str) -> int:
-    return cli.main(["--root", str(repo), "--today", "2026-11-06", *extra])
+    # The CLI's own default for --today (the current UTC date), as CI uses it.
+    return cli.main(["--root", str(repo), *extra])
 
 
 def test_clean_dataset_passes(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
@@ -66,7 +67,8 @@ def test_base_ref_detects_edited_log(
         "  supersedes: none\n"
     )
     log = repo / "logs" / "unverified.yaml"
-    head = log.read_text(encoding="utf-8").replace("entries: []\n", "")
+    text = log.read_text(encoding="utf-8")
+    head = text[: text.index("entries:")]
     log.write_text(head + entry.format(reason="edited"), encoding="utf-8")
     base = head + entry.format(reason="original")
     monkeypatch.setattr(
@@ -81,4 +83,4 @@ def test_git_show_missing_ref_returns_none() -> None:
 
 
 def test_packaged_dataset_is_valid() -> None:
-    assert cli.main(["--root", str(ROOT), "--today", "2026-11-06"]) == 0
+    assert cli.main(["--root", str(ROOT)]) == 0

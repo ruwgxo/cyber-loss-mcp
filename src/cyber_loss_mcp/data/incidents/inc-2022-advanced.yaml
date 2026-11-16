@@ -1,0 +1,66 @@
+title: Advanced Computer Software Group ransomware attack, 2022
+id: inc-2022-advanced
+updated: '2026-11-16'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Advanced Computer Software Group Limited
+  organisation_kind: private_company
+  country: GB
+  sector: '51'
+  sector_basis: Software and IT services provider; sector assigned by the maintainer, not stated in the source
+  first_disclosed: '2025-03-26'
+  attack_types: [ransomware]
+  attack_type_basis: >
+    The penalty notice says personal data was exfiltrated by an attacker who
+    gained unauthorised access to the IT environment of Advanced Health and Care
+    Limited via a ransomware attack between 2 to 4 August 2022.
+  attack_type_source: src-1
+  summary: >
+    An attacker gained access to the IT environment of Advanced's health and care
+    subsidiary via a ransomware attack in August 2022, and the personal data of
+    79,404 data subjects was exfiltrated. The UK Information Commissioner's Office
+    fined Advanced under the UK GDPR after a settlement.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: £3,076,320
+  loss_type: regulatory_fine
+  status: reported
+  currency: GBP
+  insurance_basis: not_stated
+  source: src-1
+  locator: Penalty Notice, paragraph 5, printed page 3
+  quote: >
+    Advanced acknowledged the Commissioner’s decision and agreed to pay a penalty
+    of £3,076,320.
+  values:
+    qualifier: exact
+    amount: '3076320'
+    period_end: '2025-03-26'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: Information Commissioner's Office
+  title: >-
+    Penalty Notice, Advanced Computer Software Group Limited, Advanced Health and
+    Care Limited and Aston Midco Limited, 26 March 2025
+  url: https://ico.org.uk/media2/gdlfddgc/advanced-penalty-notice-20250327.pdf
+  published: '2025-03-26'
+  retrieved: '2026-11-16'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-16'
+  method: >
+    Downloaded the penalty notice from ico.org.uk, found the figure in paragraph 5,
+    and confirmed amount, currency and wording against a rendered image of printed
+    page 3.

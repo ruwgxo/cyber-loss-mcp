@@ -10,10 +10,11 @@ statement, or, for aggregates only, the FBI IC3 annual report. Figures the
 source discloses and figures that are estimates are kept apart and labelled.
 A figure that can't be checked against its source isn't included.
 
-> **Status: schema and validation built; no incident data or server yet.** The
-> [design](docs/DESIGN.md) is approved. The record schema and its validator are in
-> place, and every record will be checked in CI ([how](docs/VALIDATION.md)). The tools
-> below describe the intended behaviour and will be updated as each part lands.
+> **Status: first incident records under review; no server yet.** The
+> [design](docs/DESIGN.md) is approved, and every record is checked in CI
+> ([how](docs/VALIDATION.md)). The dataset holds its first five incidents, all UK ICO
+> fines. The tools below describe the intended behaviour and will be updated as each
+> part lands.
 
 ## Why it exists
 

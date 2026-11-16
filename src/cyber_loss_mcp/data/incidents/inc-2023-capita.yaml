@@ -1,0 +1,67 @@
+title: Capita ransomware attack, 2023
+id: inc-2023-capita
+updated: '2026-11-16'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Capita plc and Capita Pension Solutions Limited
+  organisation_kind: public_company
+  country: GB
+  sector: '56'
+  sector_basis: Business process outsourcing; sector assigned by the maintainer, not stated in the source
+  first_disclosed: '2025-10-15'
+  attack_types: [ransomware]
+  attack_type_basis: >
+    The penalty notice describes a cyber-attack which began on 22 March 2023 and
+    culminated on 31 March 2023, when Capita became aware that it had been subject
+    to a ransomware attack.
+  attack_type_source: src-1
+  summary: >
+    A threat actor gained access to Capita's systems on 22 March 2023, and data
+    relating to 6,656,037 individuals was exfiltrated. The UK Information
+    Commissioner's Office fined Capita plc and Capita Pension Solutions Limited
+    under the UK GDPR after a voluntary settlement.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: £14,000,000
+  loss_type: regulatory_fine
+  status: reported
+  currency: GBP
+  insurance_basis: not_stated
+  source: src-1
+  locator: Penalty Notice, paragraph 10, printed page 8
+  quote: >
+    The Capita Entities made full admissions in relation to the Commissioner’s
+    findings of infringement and have agreed to pay a combined penalty of
+    £14,000,000 (comprising a penalty of £8,000,000 against Capita plc and a
+    penalty of £6,000,000 against CPSL).
+  values:
+    qualifier: exact
+    amount: '14000000'
+    period_end: '2025-10-15'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: Information Commissioner's Office
+  title: Penalty Notice, Capita plc and Capita Pension Solutions Limited, 15 October 2025
+  url: https://ico.org.uk/media2/pv5nhks4/capita-plc-and-cpsl-monetary-penalty-notice.pdf
+  published: '2025-10-15'
+  retrieved: '2026-11-16'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-16'
+  method: >
+    Downloaded the penalty notice from ico.org.uk, found the combined figure in
+    paragraph 10, and confirmed amount, currency and wording against a rendered
+    image of printed page 8. The combined figure is recorded, not its two parts, so
+    the fine is counted once.
