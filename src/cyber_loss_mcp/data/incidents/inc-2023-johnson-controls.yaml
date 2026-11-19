@@ -1,0 +1,66 @@
+title: Johnson Controls cybersecurity incident, 2023
+id: inc-2023-johnson-controls
+updated: '2026-11-19'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Johnson Controls International plc
+  organisation_kind: public_company
+  country: IE
+  sector: '31-33'
+  sector_basis: EDGAR SIC 3585 (air-conditioning and refrigeration equipment), NAICS sector 31-33
+  first_disclosed: '2024-01-30'
+  attack_types: [ransomware]
+  attack_type_basis: >
+    The 10-Q says the incident consisted of unauthorized access, data exfiltration
+    and deployment of ransomware by a third party.
+  attack_type_source: src-1
+  summary: >
+    During the weekend of 23 September 2023 Johnson Controls experienced a
+    cybersecurity incident affecting its internal IT infrastructure and
+    applications, and reported the impact on net income in its next quarterly
+    report.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: 'approximately $27 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: net_of_insurance
+  source: src-1
+  locator: Form 10-Q, Part I, Item 2 (Management’s Discussion and Analysis), Cybersecurity Incident
+  quote: >
+    The impact on net income for the three months ended December 31, 2023 of lost
+    and deferred revenues, net of revenues deferred at the end of fiscal 2023 and
+    recognized in the first quarter of fiscal 2024, and expenses during the quarter
+    was approximately $27 million.
+  values:
+    qualifier: approximately
+    amount: '27000000'
+    period_start: '2023-10-01'
+    period_end: '2023-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: Johnson Controls International plc
+  title: Form 10-Q for the quarter ended 31 December 2023
+  url: https://www.sec.gov/Archives/edgar/data/833444/000083344424000011/jci-20231231.htm
+  published: '2024-01-30'
+  retrieved: '2026-11-19'
+  sec: {form: 10-Q, cik: '0000833444', accession: 0000833444-24-000011}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.

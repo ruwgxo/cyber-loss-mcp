@@ -1,0 +1,65 @@
+title: T-Mobile cyberattack, 2021
+id: inc-2021-t-mobile
+updated: '2026-11-19'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: T-Mobile US, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '51'
+  sector_basis: EDGAR SIC 4812 (radiotelephone communications), NAICS sector 51
+  first_disclosed: '2022-07-22'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 8-K describes a 2021 criminal cyberattack involving unauthorized access to
+    the company’s systems.
+  attack_type_source: src-1
+  summary: >
+    T-Mobile agreed in July 2022 to settle the consolidated class action over its
+    2021 cyberattack, in which information about current, former and prospective
+    customers was compromised. The settlement was subject to court approval when
+    filed.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$350.0 million'
+  loss_type: settlement
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 8.01 (Other Events)
+  quote: >
+    If approved by the court, under the terms of the proposed settlement, the
+    Company would pay an aggregate of $350.0 million to fund claims submitted by
+    class members, the legal fees of plaintiffs’ counsel and the costs of
+    administering the settlement.
+  values:
+    qualifier: exact
+    amount: '350000000'
+    period_end: '2022-07-22'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: T-Mobile US, Inc.
+  title: Form 8-K filed 22 July 2022
+  url: https://www.sec.gov/Archives/edgar/data/1283699/000119312522200065/d790999d8k.htm
+  published: '2022-07-22'
+  retrieved: '2026-11-19'
+  sec: {form: 8-K, item: '8.01', cik: '0001283699', accession: 0001193125-22-200065}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.

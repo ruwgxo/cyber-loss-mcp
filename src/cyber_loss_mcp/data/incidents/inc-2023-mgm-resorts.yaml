@@ -1,0 +1,64 @@
+title: MGM Resorts cybersecurity issue, 2023
+id: inc-2023-mgm-resorts
+updated: '2026-11-19'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: MGM Resorts International
+  organisation_kind: public_company
+  country: US
+  sector: '72'
+  sector_basis: EDGAR SIC 7011 (Hotels and Motels), NAICS sector 72
+  first_disclosed: '2023-10-05'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 8-K says criminal actors obtained personal information of some customers,
+    and refers to unauthorized third-party activity.
+  attack_type_source: src-1
+  summary: >
+    MGM Resorts disclosed a cybersecurity issue in September 2023 that disrupted
+    operations at affected properties, and reported its one-time expenses for the
+    third quarter in an 8-K.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: 'less than $10 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 7.01 (Regulation FD Disclosure)
+  quote: >
+    The Company has also incurred less than $10 million in one-time expenses in the
+    third quarter related to the cybersecurity issue, which consisted of technology
+    consulting services, legal fees and expenses of other third party advisors.
+  values:
+    qualifier: up_to
+    amount: '10000000'
+    period_start: '2023-07-01'
+    period_end: '2023-09-30'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: MGM Resorts International
+  title: Form 8-K filed 5 October 2023
+  url: https://www.sec.gov/Archives/edgar/data/789570/000119312523251667/d461062d8k.htm
+  published: '2023-10-05'
+  retrieved: '2026-11-19'
+  sec: {form: 8-K, item: '7.01', cik: '0000789570', accession: 0001193125-23-251667}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.

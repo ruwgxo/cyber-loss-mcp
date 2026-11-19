@@ -12,8 +12,8 @@ A figure that can't be checked against its source isn't included.
 
 > **Status: first incident records under review; no server yet.** The
 > [design](docs/DESIGN.md) is approved, and every record is checked in CI
-> ([how](docs/VALIDATION.md)). The dataset holds its first five incidents, all UK ICO
-> fines. The tools below describe the intended behaviour and will be updated as each
+> ([how](docs/VALIDATION.md)). The dataset holds its first ten incidents: five UK ICO
+> fines and five figures from SEC filings. The tools below describe the intended behaviour and will be updated as each
 > part lands.
 
 ## Why it exists
