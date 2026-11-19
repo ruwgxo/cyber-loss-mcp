@@ -1,0 +1,130 @@
+title: Equifax data breach, 2017
+id: inc-2017-equifax
+updated: '2026-11-19'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Equifax Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '56'
+  sector_basis: EDGAR SIC 7320 (consumer credit reporting), NAICS sector 56
+  first_disclosed: '2019-07-22'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 8-K describes a cybersecurity incident in 2017 following a criminal attack
+    on the company’s systems that involved the theft of personally identifiable
+    information of consumers.
+  attack_type_source: src-1
+  summary: >
+    Equifax disclosed in July 2019 agreements resolving the US consumer class action
+    and investigations by the FTC, the CFPB, 48 state attorneys general, the
+    District of Columbia, Puerto Rico and NYDFS over its 2017 breach. Parts of the
+    settlement were subject to court approval when filed.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$380.5 million'
+  loss_type: settlement
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 1.01
+  quote: >
+    Under the terms of the Consumer Settlement, the Company will contribute $380.5
+    million to a non-reversionary settlement fund (the “Consumer Restitution Fund”)
+  values:
+    qualifier: exact
+    amount: '380500000'
+    period_end: '2019-07-22'
+    cumulative: false
+- id: fig-2
+  as_stated: '$180.5 million'
+  loss_type: settlement
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 1.01
+  quote: >
+    The Company also agreed to pay an additional $180.5 million to the MSAG Group
+    and the following monetary penalties: (1) $100 million to the CFPB and (2) $10
+    million to the NYDFS.
+  values:
+    qualifier: exact
+    amount: '180500000'
+    period_end: '2019-07-22'
+    cumulative: false
+- id: fig-3
+  as_stated: '$100 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 1.01
+  quote: >
+    The Company also agreed to pay an additional $180.5 million to the MSAG Group
+    and the following monetary penalties: (1) $100 million to the CFPB and (2) $10
+    million to the NYDFS.
+  values:
+    qualifier: exact
+    amount: '100000000'
+    period_end: '2019-07-22'
+    cumulative: false
+- id: fig-4
+  as_stated: '$10 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 8-K, Item 1.01
+  quote: >
+    The Company also agreed to pay an additional $180.5 million to the MSAG Group
+    and the following monetary penalties: (1) $100 million to the CFPB and (2) $10
+    million to the NYDFS.
+  values:
+    qualifier: exact
+    amount: '10000000'
+    period_end: '2019-07-22'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: Equifax Inc.
+  title: Form 8-K filed 22 July 2019
+  url: https://www.sec.gov/Archives/edgar/data/33185/000119312519198584/d734596d8k.htm
+  published: '2019-07-22'
+  retrieved: '2026-11-19'
+  sec: {form: 8-K, item: '1.01', cik: '0000033185', accession: 0001193125-19-198584}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.
+- figure: fig-2
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.
+- figure: fig-3
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.
+- figure: fig-4
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.

@@ -1,0 +1,64 @@
+title: Change Healthcare cyberattack, 2024
+id: inc-2024-change-healthcare
+updated: '2026-11-19'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: UnitedHealth Group Incorporated
+  organisation_kind: public_company
+  country: US
+  sector: '52'
+  sector_basis: EDGAR SIC 6324 (Hospital and Medical Service Plans), NAICS sector 52
+  first_disclosed: '2024-05-09'
+  attack_types: [not_disclosed]
+  attack_type_basis: >
+    The 10-Q refers to the Change Healthcare cyberattack without saying what kind of
+    attack it was.
+  attack_type_source: src-1
+  summary: >
+    UnitedHealth Group reported the costs of the cyberattack on its Change
+    Healthcare business in its first-quarter 2024 Form 10-Q.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$593 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: Form 10-Q, Part I, Item 2 (Management’s Discussion and Analysis)
+  quote: >
+    For the three months ended March 31, 2024, we incurred $593 million of direct
+    response costs, including network restoration and increased medical care
+    expenditures, as we suspended some care management activities to help care
+    providers with their workflow processes.
+  values:
+    qualifier: exact
+    amount: '593000000'
+    period_start: '2024-01-01'
+    period_end: '2024-03-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: UnitedHealth Group Incorporated
+  title: Form 10-Q for the quarter ended 31 March 2024
+  url: https://www.sec.gov/Archives/edgar/data/731766/000073176624000155/unh-20240331.htm
+  published: '2024-05-09'
+  retrieved: '2026-11-19'
+  sec: {form: 10-Q, cik: '0000731766', accession: 0000731766-24-000155}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-19'
+  method: >
+    Fetched the filing from EDGAR, found the quoted sentence in the filing text, and
+    confirmed amount, currency, period and qualifier against it.
