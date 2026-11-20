@@ -1,0 +1,64 @@
+title: First American document exposure, 2019
+id: inc-2019-first-american
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: First American Financial Corporation
+  organisation_kind: public_company
+  country: US
+  sector: '52'
+  sector_basis: 'EDGAR SIC 6361 (Title Insurance), NAICS sector 52'
+  first_disclosed: '2021-06-15'
+  attack_types: [misconfiguration_exposure]
+  attack_type_basis: >
+    The SEC says a vulnerability in the company’s application for sharing document
+    images exposed over 800 million images, including images containing sensitive
+    personal data.
+  attack_type_source: src-1
+  summary: >
+    In May 2019 a journalist notified First American of a vulnerability in its
+    document-sharing application that exposed over 800 million images. The SEC
+    settled charges over related disclosure controls failures in June 2021.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$487,616'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'SEC press release 2021-102'
+  quote: >
+    Without admitting or denying the SEC’s findings, First American agreed to a
+    cease-and-desist order and to pay a $487,616 penalty.
+  values:
+    qualifier: exact
+    amount: '487616'
+    period_end: '2021-06-15'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: 'U.S. Securities and Exchange Commission'
+  title: >
+    SEC Charges Issuer With Cybersecurity Disclosure Controls Failures, press
+    release 2021-102
+  url: https://www.sec.gov/newsroom/press-releases/2021-102
+  published: '2021-06-15'
+  retrieved: '2026-11-20'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the SEC press release from sec.gov, found the quoted sentence, and
+    confirmed amount and currency against it.

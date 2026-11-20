@@ -1,0 +1,91 @@
+title: Marriott Starwood reservations database incident, 2018
+id: inc-2018-marriott-starwood
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Marriott International, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '72'
+  sector_basis: 'EDGAR SIC 7011 (Hotels and Motels), NAICS sector 72'
+  first_disclosed: '2020-02-27'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-K describes a data security incident involving unauthorized access to the
+    Starwood reservations database, announced on 30 November 2018.
+  attack_type_source: src-1
+  summary: >
+    Marriott announced on 30 November 2018 a data security incident involving
+    unauthorized access to the Starwood reservations database, and reported the
+    expenses it recorded for the incident in 2018 and 2019 in its 2019 Form 10-K.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$148 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 8, note on the Data Security Incident (Expenses and Insurance Recoveries)'
+  quote: >
+    We recorded $148 million of expenses, partially offset by $84 million of accrued
+    insurance recoveries related to the Data Security Incident in 2019, and $28
+    million of expenses, partially offset by $25 million of accrued insurance
+    recoveries, related to the Data Security Incident in 2018.
+  values:
+    qualifier: exact
+    amount: '148000000'
+    period_start: '2019-01-01'
+    period_end: '2019-12-31'
+    cumulative: false
+- id: fig-2
+  as_stated: '$28 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 8, note on the Data Security Incident (Expenses and Insurance Recoveries)'
+  quote: >
+    We recorded $148 million of expenses, partially offset by $84 million of accrued
+    insurance recoveries related to the Data Security Incident in 2019, and $28
+    million of expenses, partially offset by $25 million of accrued insurance
+    recoveries, related to the Data Security Incident in 2018.
+  values:
+    qualifier: exact
+    amount: '28000000'
+    period_start: '2018-01-01'
+    period_end: '2018-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Marriott International, Inc.'
+  title: Form 10-K for the year ended 31 December 2019
+  url: https://www.sec.gov/Archives/edgar/data/1048286/000162828020002376/mar-q42019x10k.htm
+  published: '2020-02-27'
+  retrieved: '2026-11-20'
+  sec: {form: 10-K, cik: '0001048286', accession: 0001628280-20-002376}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Insurance recoveries stated in the same sentence are not recorded as losses.
+- figure: fig-2
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Insurance recoveries stated in the same sentence are not recorded as losses.

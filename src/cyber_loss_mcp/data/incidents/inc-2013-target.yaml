@@ -1,0 +1,65 @@
+title: Target payment card data breach, 2013
+id: inc-2013-target
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Target Corporation
+  organisation_kind: public_company
+  country: US
+  sector: '44-45'
+  sector_basis: 'EDGAR SIC 5331 (Retail-Variety Stores), NAICS sector 44-45'
+  first_disclosed: '2015-03-13'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-K says that in the fourth quarter of 2013 an intruder stole certain
+    payment card and other guest information from the company network.
+  attack_type_source: src-1
+  summary: >
+    Target experienced a data breach in the fourth quarter of 2013 in which an
+    intruder stole payment card and other guest information, and reported its
+    cumulative breach-related expenses in its fiscal 2014 Form 10-K.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$252 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 7 (Management’s Discussion and Analysis), Data Breach'
+  quote: >
+    As of January 31, 2015 we have incurred $252 million of cumulative Data
+    Breach-related expenses, partially offset by $90 million of expected insurance
+    recoveries, for net cumulative expenses of $162 million.
+  values:
+    qualifier: exact
+    amount: '252000000'
+    period_end: '2015-01-31'
+    cumulative: true
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Target Corporation'
+  title: Form 10-K for the fiscal year ended 31 January 2015
+  url: https://www.sec.gov/Archives/edgar/data/27419/000002741915000012/tgt-20150131x10k.htm
+  published: '2015-03-13'
+  retrieved: '2026-11-20'
+  sec: {form: 10-K, cik: '0000027419', accession: 0000027419-15-000012}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Only the cumulative gross figure is recorded; the 2014 figure in the same
+    section is part of it and would be counted twice.

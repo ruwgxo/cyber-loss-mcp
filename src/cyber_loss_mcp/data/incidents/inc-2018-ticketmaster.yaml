@@ -1,0 +1,64 @@
+title: Ticketmaster UK data breach, 2018
+id: inc-2018-ticketmaster
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Ticketmaster UK Limited
+  organisation_kind: private_company
+  country: GB
+  sector: '56'
+  sector_basis: 'Event ticketing; sector assigned by the maintainer, not stated in the source'
+  first_disclosed: '2020-11-13'
+  attack_types: [supply_chain_compromise]
+  attack_type_basis: >
+    The penalty notice says the chat bot supplier Inbenta was aware of a potential
+    compromise of its code, and that the code submitted information to an external
+    website.
+  attack_type_source: src-1
+  summary: >
+    A compromised third-party chat bot on Ticketmaster’s payment page led to a
+    personal data breach running from February to 23 June 2018. The UK Information
+    Commissioner’s Office fined Ticketmaster UK under the GDPR.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '£1,250,000.00'
+  loss_type: regulatory_fine
+  status: reported
+  currency: GBP
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Penalty Notice, paragraph 1.5, printed page 3'
+  quote: >
+    The amount of the penalty that the Commissioner has decided to impose is
+    £1,250,000.00.
+  values:
+    qualifier: exact
+    amount: '1250000'
+    period_end: '2020-11-13'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: 'Information Commissioner''s Office'
+  title: >
+    Penalty Notice, Ticketmaster UK Limited, case ref COM0759008, 13 November 2020
+  url: https://ico.org.uk/media2/migrated/2618609/ticketmaster-uk-limited-mpn.pdf
+  published: '2020-11-13'
+  retrieved: '2026-11-20'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Downloaded the penalty notice from ico.org.uk, found the figure in the text of
+    paragraph 1.5, and confirmed amount, currency and wording against a rendered
+    image of printed page 3.

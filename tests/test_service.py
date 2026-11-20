@@ -15,7 +15,27 @@ from cyber_loss_mcp import models as m
 from . import synthetic
 from .conftest import TODAY
 
-REAL = dataset.load()
+# Exact-value regression tests run on a fixed baseline: the first ten incidents, by id.
+# Adding records never changes these expectations; correcting one of these ten does,
+# deliberately.
+BASELINE_IDS = (
+    "inc-2017-equifax",
+    "inc-2018-british-airways",
+    "inc-2021-t-mobile",
+    "inc-2022-advanced",
+    "inc-2022-dpp-law",
+    "inc-2023-23andme",
+    "inc-2023-capita",
+    "inc-2023-johnson-controls",
+    "inc-2023-mgm-resorts",
+    "inc-2024-change-healthcare",
+)
+_FULL = dataset.load()
+REAL = dataset.Dataset(
+    version=_FULL.version,
+    digest=_FULL.digest,
+    incidents={k: _FULL.incidents[k] for k in BASELINE_IDS},
+)
 
 
 def ds_of(tmp_path: Path, docs: list[dict[str, Any]]) -> dataset.Dataset:
@@ -316,6 +336,18 @@ def test_estimate_year_order_checked() -> None:
             disclosed_from=2025,
             disclosed_to=2024,
         )
+
+
+def test_full_dataset_tools_run() -> None:
+    """Every tool also runs cleanly over the full packaged dataset."""
+    assert service.search_incidents(_FULL, limit=50).result.total_matches == len(_FULL.incidents)
+    for group_by in ("sector", "attack_type", "country", "year"):
+        assert_envelope(
+            service.loss_statistics(
+                _FULL, group_by=group_by, loss_type="regulatory_fine", currency="USD"
+            )
+        )
+    assert_envelope(service.list_sources(_FULL))
 
 
 # get_aggregates and list_sources ----------------------------------------------------

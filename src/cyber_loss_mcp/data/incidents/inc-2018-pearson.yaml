@@ -1,0 +1,64 @@
+title: Pearson cyber intrusion, 2018
+id: inc-2018-pearson
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Pearson plc
+  organisation_kind: public_company
+  country: GB
+  sector: '51'
+  sector_basis: 'EDGAR SIC 2731 (Books: Publishing), NAICS sector 51'
+  first_disclosed: '2021-08-16'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The SEC describes a 2018 cyber intrusion involving the theft of millions of
+    student records.
+  attack_type_source: src-1
+  summary: >
+    Pearson suffered a cyber intrusion in 2018 involving the theft of millions of
+    student records. The SEC settled charges in August 2021 that Pearson misled
+    investors about it and had inadequate disclosure controls.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$1 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'SEC press release 2021-154'
+  quote: >
+    Without admitting or denying the SEC's findings, Pearson agreed to cease and
+    desist from committing violations of these provisions and to pay a $1 million
+    civil penalty.
+  values:
+    qualifier: exact
+    amount: '1000000'
+    period_end: '2021-08-16'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: 'U.S. Securities and Exchange Commission'
+  title: >
+    SEC Charges Pearson plc for Misleading Investors About Cyber Breach, press
+    release 2021-154
+  url: https://www.sec.gov/newsroom/press-releases/2021-154
+  published: '2021-08-16'
+  retrieved: '2026-11-20'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the SEC press release from sec.gov, found the quoted sentence, and
+    confirmed amount and currency against it.
