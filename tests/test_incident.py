@@ -252,10 +252,14 @@ CASES: list[tuple[str, Callable[[Doc], None], str | None]] = [
         "only sec_filing sources carry sec identifiers",
     ),
     # Text hygiene.
-    ("zero-width space", _set("incident.summary", "Example\u200bManufacturing"), "U+200B"),
-    ("bidi override", _set("incident.organisation", "Example\u202eInc"), "U+202E"),
+    (
+        "zero-width space",
+        _set("incident.summary", "Example" + chr(0x200B) + "Manufacturing"),
+        "U+200B",
+    ),
+    ("bidi override", _set("incident.organisation", "Example" + chr(0x202E) + "Inc"), "U+202E"),
     ("control character", _set("incident.summary", "a\x07b"), "U+0007"),
-    ("not NFC", _set("incident.organisation", "Cafe\u0301"), "NFC"),
+    ("not NFC", _set("incident.organisation", "Cafe" + chr(0x0301)), "NFC"),
     ("two paragraphs", _set("incident.summary", "One.\n\nTwo."), "spans paragraphs"),
 ]
 

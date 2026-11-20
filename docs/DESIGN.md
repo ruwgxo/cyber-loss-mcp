@@ -1,8 +1,7 @@
 # cyber-loss-mcp design
 
 Status: **approved 2026-11-06**, with the defaults in [section 10](#10-decisions).
-Schema and validation are built; see [VALIDATION.md](VALIDATION.md). The server is not
-built yet.
+Schema, validation and the server are built; see [VALIDATION.md](VALIDATION.md).
 
 ## 1. Purpose and non-goals
 
@@ -66,11 +65,11 @@ and its tests, not from the annotations.
 
 ```
 src/cyber_loss_mcp/
-  server.py            tool registration, stdio entry point (step 3)
-  models.py            Pydantic models for records and tool I/O (step 3)
-  dataset.py           loads and validates the bundled data at startup, fails closed (step 3)
-  stats.py             Decimal-only order statistics (step 3)
-  tools/               one module per tool (step 3)
+  server.py            tool registration, strict arguments, rate limit, stdio entry point
+  service.py           tool logic as plain functions over the dataset
+  models.py            tool output models (each published as an output schema)
+  dataset.py           loads and validates the bundled data at startup, fails closed
+  stats.py             Decimal-only order statistics
   validation/          YAML, schema, standard and semantic checks; cyber-loss-validate
   data/incidents/      one YAML record per incident, named <id>.yaml
   schemas/             domain schemas (JSON Schema 2020-12)

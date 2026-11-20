@@ -10,11 +10,10 @@ statement, or, for aggregates only, the FBI IC3 annual report. Figures the
 source discloses and figures that are estimates are kept apart and labelled.
 A figure that can't be checked against its source isn't included.
 
-> **Status: first incident records under review; no server yet.** The
-> [design](docs/DESIGN.md) is approved, and every record is checked in CI
-> ([how](docs/VALIDATION.md)). The dataset holds its first ten incidents: five UK ICO
-> fines and five figures from SEC filings. The tools below describe the intended behaviour and will be updated as each
-> part lands.
+> **Status: server and first ten incidents built; not yet released.** The dataset holds
+> ten incidents (five UK ICO fines, five figures from SEC filings), each checked in CI
+> ([how](docs/VALIDATION.md)). The six tools below are implemented and tested. Setup
+> instructions and a client configuration example come with the first release candidate.
 
 ## Why it exists
 
@@ -31,7 +30,7 @@ disclosed it. Its first uses are:
 Correctness comes before coverage. The dataset starts small (25–50 incidents,
 each checked against its sources) and grows only at that standard.
 
-## What it will do
+## What it does
 
 | Tool | Purpose |
 |---|---|
@@ -44,7 +43,7 @@ each checked against its sources) and grows only at that standard.
 Every response carries its citations and a one-line disclaimer: figures are as
 disclosed by the source and are not financial advice.
 
-The tool list is provisional until the design doc is approved.
+A sixth tool, `get_aggregates`, will serve FBI IC3 annual aggregates, kept apart from per-incident figures. No aggregate data has been added yet.
 
 ## What it won't do
 
