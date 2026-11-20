@@ -1,0 +1,118 @@
+title: Blackbaud ransomware attack, 2020
+id: inc-2020-blackbaud
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Blackbaud, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '51'
+  sector_basis: 'EDGAR SIC 7372 (Services-Prepackaged Software), NAICS sector 51'
+  first_disclosed: '2024-02-21'
+  attack_types: [ransomware]
+  attack_type_basis: >
+    The 10-K says that in May 2020 the company discovered and stopped a ransomware
+    attack, and that the cybercriminal removed a copy of a subset of data from its
+    self-hosted environment.
+  attack_type_source: src-1
+  summary: >
+    Blackbaud discovered and stopped a ransomware attack in May 2020, after the
+    attacker had removed a copy of a subset of data. Its 2023 Form 10-K reports the
+    year’s incident-related expenses and two civil penalties paid in 2023.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$53.4 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: net_of_insurance
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    For example, for full year 2023, we incurred net pre-tax expenses of $53.4
+    million related to the Security Incident, which included $22.4 million for
+    ongoing legal fees and $31.0 million for settlements and recorded liabilities
+    for loss contingencies.
+  values:
+    qualifier: exact
+    amount: '53400000'
+    period_start: '2023-01-01'
+    period_end: '2023-12-31'
+    cumulative: false
+- id: fig-2
+  as_stated: '$3.0 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    the $3.0 million civil penalty paid during the first quarter of 2023 related to
+    the SEC settlement and the $49.5 million civil penalty paid during the fourth
+    quarter of 2023 related to the Multistate Investigation
+  values:
+    qualifier: exact
+    amount: '3000000'
+    period_start: '2023-01-01'
+    period_end: '2023-03-31'
+    cumulative: false
+- id: fig-3
+  as_stated: '$49.5 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    the $3.0 million civil penalty paid during the first quarter of 2023 related to
+    the SEC settlement and the $49.5 million civil penalty paid during the fourth
+    quarter of 2023 related to the Multistate Investigation
+  values:
+    qualifier: exact
+    amount: '49500000'
+    period_start: '2023-10-01'
+    period_end: '2023-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Blackbaud, Inc.'
+  title: Form 10-K for the year ended 31 December 2023
+  url: https://www.sec.gov/Archives/edgar/data/1280058/000128005824000013/blkb-20231231.htm
+  published: '2024-02-21'
+  retrieved: '2026-11-20'
+  sec: {form: 10-K, cik: '0001280058', accession: 0001280058-24-000013}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The non-GAAP reconciliation in the same filing labels the $53.4 million as
+    Security Incident-related costs, net of insurance.
+- figure: fig-2
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The non-GAAP reconciliation in the same filing labels the $53.4 million as
+    Security Incident-related costs, net of insurance.
+- figure: fig-3
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The non-GAAP reconciliation in the same filing labels the $53.4 million as
+    Security Incident-related costs, net of insurance.

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from cyber_loss_mcp import dataset
+from cyber_loss_mcp.validation import paths
 
 from . import synthetic
 from .conftest import TODAY
@@ -13,7 +14,8 @@ from .conftest import TODAY
 
 def test_packaged_dataset_loads() -> None:
     ds = dataset.load()
-    assert len(ds.incidents) == 10
+    files = list(Path(str(paths.INCIDENTS)).glob("*.yaml"))
+    assert len(ds.incidents) == len(files) >= 10
     assert ds.version == dataset.DATASET_VERSION
     assert ds.digest.startswith("sha256:")
     assert ds.digest == dataset.load().digest
