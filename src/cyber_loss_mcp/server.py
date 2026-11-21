@@ -12,7 +12,7 @@ import time
 from collections.abc import Callable
 from functools import wraps
 from importlib.metadata import version
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, Literal, cast
 
 from mcp.server import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -36,6 +36,7 @@ IncidentId = Annotated[
     str, StringConstraints(pattern=r"^inc-[0-9]{4}-[a-z0-9]+(-[a-z0-9]+)*$", max_length=64)
 ]
 Category = Annotated[str, StringConstraints(pattern=r"^[a-z0-9_]{1,64}$")]
+InsuranceBasis = Literal["gross", "net_of_insurance", "not_stated"]
 
 READ_ONLY = ToolAnnotations(
     read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False
@@ -164,6 +165,8 @@ def build_server(ds: Dataset, limiter: RateLimiter | None = None) -> MCPServer[A
         loss_type: LossType,
         currency: Currency,
         status: Status = "reported",
+        insurance_basis: InsuranceBasis | None = None,
+        cumulative: bool | None = None,
         sector: Sector | None = None,
         attack_type: AttackType | None = None,
         country: Country | None = None,
@@ -172,14 +175,17 @@ def build_server(ds: Dataset, limiter: RateLimiter | None = None) -> MCPServer[A
     ) -> m.StatisticsResponse:
         """Group loss figures and report n, min, median and max per group, never a mean,
         listing every contributing figure and every excluded figure with the reason.
-        One loss type, one currency and one status at a time: reported and estimated
-        figures are never pooled, and currencies are never converted."""
+        One loss type, currency and status at a time: reported and estimated figures are
+        never pooled, currencies are never converted, and figures with a different
+        insurance basis or period type (cumulative or single period) form separate groups."""
         return service.loss_statistics(
             ds,
             group_by=group_by,
             loss_type=loss_type,
             currency=currency,
             status=status,
+            insurance_basis=insurance_basis,
+            cumulative=cumulative,
             sector=sector,
             attack_type=attack_type,
             country=country,
@@ -192,6 +198,8 @@ def build_server(ds: Dataset, limiter: RateLimiter | None = None) -> MCPServer[A
         attack_type: AttackType,
         loss_type: LossType,
         currency: Currency,
+        insurance_basis: InsuranceBasis | None = None,
+        cumulative: bool | None = None,
         sector: Sector | None = None,
         country: Country | None = None,
         disclosed_from: Year | None = None,
@@ -202,6 +210,8 @@ def build_server(ds: Dataset, limiter: RateLimiter | None = None) -> MCPServer[A
             attack_type=attack_type,
             loss_type=loss_type,
             currency=currency,
+            insurance_basis=insurance_basis,
+            cumulative=cumulative,
             sector=sector,
             country=country,
             disclosed_from=disclosed_from,
@@ -223,8 +233,10 @@ def build_server(ds: Dataset, limiter: RateLimiter | None = None) -> MCPServer[A
     estimate_loss_range.__doc__ = (
         "FAIR-style loss range from comparable incidents: observed min, quartiles, median "
         "and max of reported figures, with the method, every comparable and n. Refuses, "
-        f"with outcome 'refused', when fewer than {service.MIN_COMPARABLES} comparables "
-        "exist. A starting point for calibration, not a calibrated estimate."
+        f"with outcome 'refused', when fewer than {service.MIN_COMPARABLES} comparables exist "
+        "or when they mix insurance bases or period types; set insurance_basis and "
+        "cumulative to choose one kind. A starting point for calibration, not a calibrated "
+        "estimate."
     )
 
     fns: list[Callable[..., BaseModel]] = [

@@ -30,6 +30,8 @@ def incident(
     attack_types: list[str] | None = None,
     sector: str = "31-33",
     country: str = "US",
+    insurance_basis: str = "gross",
+    cumulative: bool = False,
 ) -> dict[str, Any]:
     """A fictional incident ``inc-2024-synthetic-<n>``. ``amounts`` is a list of
     (as_stated, amount_or_range) pairs; a range is written 'low..high'."""
@@ -43,9 +45,15 @@ def incident(
     figures, verification = [], []
     for k, (as_stated, value) in enumerate(amounts or [("$1,000,000", "1000000")], start=1):
         f = copy.deepcopy(template)
-        f.update(id=f"fig-{k}", as_stated=as_stated, loss_type=loss_type, status=status)
+        f.update(
+            id=f"fig-{k}",
+            as_stated=as_stated,
+            loss_type=loss_type,
+            status=status,
+            insurance_basis=insurance_basis,
+        )
         f["quote"] = f"Fictional source sentence stating {as_stated} of losses."
-        values: dict[str, Any] = {"period_end": "2024-03-31", "cumulative": False}
+        values: dict[str, Any] = {"period_end": "2024-03-31", "cumulative": cumulative}
         lowered = as_stated.lower()
         if ".." in value:
             low, high = value.split("..")

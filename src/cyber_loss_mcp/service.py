@@ -24,6 +24,12 @@ MAX_RESPONSE_BYTES = 256 * 1024
 MIN_COMPARABLES = 5
 MIN_N_FOR_MEDIAN = 3
 POINT_QUALIFIERS = frozenset({"exact", "approximately"})
+POOLING_NOTE = (
+    "Figures are pooled only when they share an insurance basis (gross, net_of_insurance or "
+    "not_stated) and a period type (cumulative over several periods, or a single period): "
+    "a gross cost and a cost net of insurance, or a multi-year total and one year's cost, "
+    "are not like for like."
+)
 REPO = "https://github.com/ruwgxo/cyber-loss-mcp"
 
 
@@ -114,10 +120,22 @@ def _incident_matches(
     )
 
 
-def _ineligible(f: Figure, loss_type: str, currency: str, status: str) -> str | None:
+def _ineligible(
+    f: Figure,
+    loss_type: str,
+    currency: str,
+    status: str,
+    *,
+    insurance_basis: str | None = None,
+    cumulative: bool | None = None,
+) -> str | None:
     """Why a figure of the requested kind cannot enter a statistic, or None if it can.
     Figures of another kind are simply not considered and return a sentinel."""
     if (f.loss_type, f.currency, f.status) != (loss_type, currency, status):
+        return "other-kind"
+    if insurance_basis is not None and f.insurance_basis != insurance_basis:
+        return "other-kind"
+    if cumulative is not None and f.cumulative != cumulative:
         return "other-kind"
     if f.superseded_by is not None:
         return f"superseded by {f.superseded_by}"
@@ -287,6 +305,8 @@ def loss_statistics(
     loss_type: str,
     currency: str,
     status: str = "reported",
+    insurance_basis: str | None = None,
+    cumulative: bool | None = None,
     sector: str | None = None,
     attack_type: str | None = None,
     country: str | None = None,
@@ -294,8 +314,9 @@ def loss_statistics(
     disclosed_to: int | None = None,
 ) -> m.StatisticsResponse:
     _check_years(disclosed_from, disclosed_to)
-    contributors: dict[str, list[Figure]] = defaultdict(list)
-    excluded: dict[str, list[tuple[Figure, str]]] = defaultdict(list)
+    GroupKey = tuple[str, str, bool]
+    contributors: dict[GroupKey, list[Figure]] = defaultdict(list)
+    excluded: dict[GroupKey, list[tuple[Figure, str]]] = defaultdict(list)
     for inc in ds.sorted_incidents():
         if not _incident_matches(
             inc,
@@ -307,14 +328,22 @@ def loss_statistics(
         ):
             continue
         for f in inc.figures:
-            reason = _ineligible(f, loss_type, currency, status)
+            reason = _ineligible(
+                f,
+                loss_type,
+                currency,
+                status,
+                insurance_basis=insurance_basis,
+                cumulative=cumulative,
+            )
             if reason == "other-kind":
                 continue
             for key in _group_keys(inc, group_by):
+                gk = (key, f.insurance_basis, f.cumulative)
                 if reason is None:
-                    contributors[key].append(f)
+                    contributors[gk].append(f)
                 else:
-                    excluded[key].append((f, reason))
+                    excluded[gk].append((f, reason))
 
     keys = sorted(set(contributors) | set(excluded))
     if len(keys) > MAX_GROUPS:
@@ -330,15 +359,18 @@ def loss_statistics(
 
     groups = []
     shown: list[m.FigureOut] = []
-    for key in keys:
-        figs = contributors.get(key, [])
+    for gk in keys:
+        key, basis, cum = gk
+        figs = contributors.get(gk, [])
         outs = [_figure(f) for f in figs]
-        ex = [m.ExcludedFigure(figure=_figure(f), reason=r) for f, r in excluded.get(key, [])]
+        ex = [m.ExcludedFigure(figure=_figure(f), reason=r) for f, r in excluded.get(gk, [])]
         shown += outs + [e.figure for e in ex]
         if not figs:
             groups.append(
                 m.Group(
                     key=key,
+                    insurance_basis=basis,
+                    cumulative=cum,
                     n_figures=0,
                     n_incidents=0,
                     min=None,
@@ -355,6 +387,8 @@ def loss_statistics(
         groups.append(
             m.Group(
                 key=key,
+                insurance_basis=basis,
+                cumulative=cum,
                 n_figures=len(values),
                 n_incidents=len({f.incident_id for f in figs}),
                 min=stats.fmt(min(values)),
@@ -370,6 +404,7 @@ def loss_statistics(
         "of them, and n_incidents shows how many incidents that is.",
         "Amounts are as disclosed: not converted between currencies, not adjusted for "
         "inflation, and not normalised by organisation size.",
+        POOLING_NOTE,
     ]
     if group_by == "attack_type":
         notes.append("An incident with several attack types appears in each of their groups.")
@@ -382,6 +417,8 @@ def loss_statistics(
             loss_type=loss_type,
             currency=currency,
             status=status,
+            insurance_basis=insurance_basis,
+            cumulative=cumulative,
             groups=groups,
             method=(
                 "Eligible figures are point amounts qualified exact or approximately, not "
@@ -412,6 +449,8 @@ def estimate_loss_range(
     attack_type: str,
     loss_type: str,
     currency: str,
+    insurance_basis: str | None = None,
+    cumulative: bool | None = None,
     sector: str | None = None,
     country: str | None = None,
     disclosed_from: int | None = None,
@@ -431,7 +470,17 @@ def estimate_loss_range(
             year_to=disclosed_to,
         ):
             continue
-        reasons = {f.id: _ineligible(f, loss_type, currency, "reported") for f in inc.figures}
+        reasons = {
+            f.id: _ineligible(
+                f,
+                loss_type,
+                currency,
+                "reported",
+                insurance_basis=insurance_basis,
+                cumulative=cumulative,
+            )
+            for f in inc.figures
+        }
         of_kind = {k: r for k, r in reasons.items() if r != "other-kind"}
         eligible = [f for f in inc.figures if of_kind.get(f.id, "x") is None]
         if not of_kind:
@@ -467,11 +516,23 @@ def estimate_loss_range(
     method = (
         "Comparables are incidents matching the filters with exactly one reported, "
         "non-superseded point figure (exact or approximately) of the requested loss type and "
-        f"currency. Refused below {MIN_COMPARABLES} comparables. {stats.QUANTILE_METHOD}"
+        "currency, all sharing one insurance basis and one period type. Refused below "
+        f"{MIN_COMPARABLES} comparables. {stats.QUANTILE_METHOD}"
     )
     observed = fair = None
     reason = None
-    if n < MIN_COMPARABLES:
+    mix = Counter((c.figure.insurance_basis, c.figure.cumulative) for c in comparables)
+    if len(mix) > 1:
+        outcome = "refused"
+        parts = ", ".join(
+            f"{count} {basis}{' cumulative' if cum else ''}"
+            for (basis, cum), count in sorted(mix.items())
+        )
+        reason = (
+            f"The comparables mix insurance bases or period types ({parts}), which are not "
+            "like for like. Choose insurance_basis and cumulative to compare one kind."
+        )
+    elif n < MIN_COMPARABLES:
         outcome = "refused"
         reason = (
             f"{n} comparable incident(s) found; at least {MIN_COMPARABLES} are needed. Widen "
@@ -499,6 +560,8 @@ def estimate_loss_range(
             minimum_comparables=MIN_COMPARABLES,
             loss_type=loss_type,
             currency=currency,
+            insurance_basis=insurance_basis,
+            cumulative=cumulative,
             comparables=comparables,
             excluded=excluded,
             observed=observed,

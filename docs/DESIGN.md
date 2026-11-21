@@ -325,6 +325,14 @@ The same method serves `loss_statistics` and `estimate_loss_range`.
 
    `at_least`, `up_to` and range figures are listed under `excluded` with the reason,
    never coerced to a point value.
+
+   Figures are pooled only when they share an insurance basis (`gross`,
+   `net_of_insurance`, `not_stated`) and a period type (cumulative, or a single
+   period). `loss_statistics` puts each combination in its own group.
+   `estimate_loss_range` refuses a mixed set of comparables and names the mix. The
+   `insurance_basis` and `cumulative` arguments select one kind. This rule was added
+   in step 4: once real costs arrived, the first candidate comparables mixed gross
+   and net figures, and multi-year totals with single years.
 2. **One per incident (`estimate_loss_range`).** The unit of analysis is the
    incident. An incident with more than one eligible figure of the loss type (for
    example, two separate settlements) is excluded with a reason, not summed. Summing
