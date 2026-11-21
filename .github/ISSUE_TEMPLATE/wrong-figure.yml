@@ -1,0 +1,39 @@
+name: Wrong figure
+description: A figure doesn't match its source, or its source doesn't support it.
+title: "Wrong figure: <incident id> <figure id>"
+labels: ["data-error"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thank you. Reported errors take priority over new data. Please quote the source
+        exactly; no personal data, please.
+  - type: input
+    id: incident
+    attributes:
+      label: Incident ID
+      description: For example inc-2023-capita. get_incident and search_incidents show it.
+      placeholder: inc-2023-capita
+    validations:
+      required: true
+  - type: input
+    id: figure
+    attributes:
+      label: Figure ID
+      placeholder: fig-1
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: What the source says
+      description: Quote the source, and give the page, paragraph or section.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: For example the amount, currency, period, status or insurance basis.
+    validations:
+      required: true
