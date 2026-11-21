@@ -1,0 +1,66 @@
+title: Mondelez malware incident, 2017
+id: inc-2017-mondelez
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Mondelez International, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '31-33'
+  sector_basis: 'EDGAR SIC 2000 (Food and Kindred Products), NAICS sector 31-33'
+  first_disclosed: '2018-02-09'
+  attack_types: [not_disclosed]
+  attack_type_basis: >
+    The 10-K describes a global malware incident on 27 June 2017 that affected a
+    significant portion of the company’s global sales, distribution and financial
+    networks, without naming the kind of malware.
+  attack_type_source: src-1
+  summary: >
+    A global malware incident on 27 June 2017 affected a significant portion of
+    Mondelez’s sales, distribution and financial networks. Its 2017 Form 10-K
+    reports the incremental expenses of the recovery effort.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$84 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 7 (Management’s Discussion and Analysis), Malware Incident'
+  quote: >
+    We also incurred incremental expenses of $84 million predominantly during the
+    second half of 2017 as part of the recovery effort.
+  values:
+    qualifier: exact
+    amount: '84000000'
+    period_start: '2017-01-01'
+    period_end: '2017-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Mondelez International, Inc.'
+  title: Form 10-K for the year ended 31 December 2017
+  url: https://www.sec.gov/Archives/edgar/data/1103982/000119312518037332/d466496d10k.htm
+  published: '2018-02-09'
+  retrieved: '2026-11-21'
+  sec: {form: 10-K, cik: '0001103982', accession: 0001193125-18-037332}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The same section gives lost revenue only as a percentage of net revenue, so no
+    amount is recorded for it.

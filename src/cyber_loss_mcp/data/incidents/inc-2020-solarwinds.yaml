@@ -1,0 +1,87 @@
+title: SolarWinds Orion cyber incident, 2020
+id: inc-2020-solarwinds
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: SolarWinds Corporation
+  organisation_kind: public_company
+  country: US
+  sector: '51'
+  sector_basis: 'EDGAR SIC 7372 (Services-Prepackaged Software), NAICS sector 51'
+  first_disclosed: '2022-02-25'
+  attack_types: [supply_chain_compromise]
+  attack_type_basis: >
+    The 10-K defines the Cyber Incident as the cyberattack on the Orion Software
+    Platform and internal systems, and calls it a sophisticated supply-chain attack.
+  attack_type_source: src-1
+  summary: >
+    SolarWinds suffered a cyberattack on its Orion Software Platform and internal
+    systems, disclosed in December 2020. Its 2021 Form 10-K reports the expenses it
+    recorded for 2020 and 2021.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$49.1 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 7 (Management’s Discussion and Analysis)'
+  quote: >
+    For the year ended December 31, 2021, we recorded pretax gross expenses related
+    to the Cyber Incident of $49.1 million
+  values:
+    qualifier: exact
+    amount: '49100000'
+    period_start: '2021-01-01'
+    period_end: '2021-12-31'
+    cumulative: false
+- id: fig-2
+  as_stated: '$3.5 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-K, Part II, Item 7 (Management’s Discussion and Analysis)'
+  quote: >
+    For the year ended December 31, 2020, we recorded $3.5 million of pretax
+    expenses related to the Cyber Incident
+  values:
+    qualifier: exact
+    amount: '3500000'
+    period_start: '2020-01-01'
+    period_end: '2020-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'SolarWinds Corporation'
+  title: Form 10-K for the year ended 31 December 2021
+  url: https://www.sec.gov/Archives/edgar/data/1739942/000173994222000020/swi-20211231.htm
+  published: '2022-02-25'
+  retrieved: '2026-11-21'
+  sec: {form: 10-K, cik: '0001739942', accession: 0001739942-22-000020}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Insurance receipts stated alongside the 2021 figure are not recorded as losses.
+- figure: fig-2
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Insurance receipts stated alongside the 2021 figure are not recorded as losses.

@@ -1,0 +1,64 @@
+title: Yahoo data breach, 2014
+id: inc-2014-yahoo
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Altaba Inc. (formerly Yahoo! Inc.)
+  organisation_kind: public_company
+  country: US
+  sector: '51'
+  sector_basis: 'Internet services; sector assigned by the maintainer, as EDGAR lists no SIC code for the filer'
+  first_disclosed: '2018-04-24'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The SEC describes a December 2014 intrusion in which hackers stole personal data
+    relating to hundreds of millions of user accounts.
+  attack_type_source: src-1
+  summary: >
+    In a December 2014 intrusion, personal data relating to hundreds of millions of
+    Yahoo user accounts was stolen. In April 2018 the entity formerly known as
+    Yahoo! Inc. settled SEC charges that it misled investors by failing to disclose
+    the breach.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$35 million'
+  loss_type: regulatory_fine
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'SEC press release 2018-71'
+  quote: >
+    has agreed to pay a $35 million penalty to settle charges that it misled
+    investors by failing to disclose one of the world’s largest data breaches
+  values:
+    qualifier: exact
+    amount: '35000000'
+    period_end: '2018-04-24'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: regulator_enforcement
+  publisher: 'U.S. Securities and Exchange Commission'
+  title: >
+    Altaba, Formerly Known as Yahoo!, Charged With Failing to Disclose Massive
+    Cybersecurity Breach; Agrees To Pay $35 Million, press release 2018-71
+  url: https://www.sec.gov/newsroom/press-releases/2018-71
+  published: '2018-04-24'
+  retrieved: '2026-11-21'
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the SEC press release from sec.gov, found the quoted sentence, and
+    confirmed amount and currency against it.
