@@ -1,0 +1,65 @@
+title: Progress Software MOVEit vulnerability, 2023
+id: inc-2023-moveit-progress
+updated: '2026-11-20'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Progress Software Corporation
+  organisation_kind: public_company
+  country: US
+  sector: '51'
+  sector_basis: 'EDGAR SIC 7372 (Services-Prepackaged Software), NAICS sector 51'
+  first_disclosed: '2024-01-26'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-K describes a zero-day vulnerability in the MOVEit Transfer and MOVEit
+    Cloud products, discovered in May 2023, and lawsuits by individuals who claim
+    data was exfiltrated from MOVEit Transfer customer environments.
+  attack_type_source: src-1
+  summary: >
+    Progress Software discovered a zero-day vulnerability in its MOVEit Transfer and
+    MOVEit Cloud products in May 2023, and reported the costs it incurred in fiscal
+    2023, net of insurance recoveries.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$1.5 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: net_of_insurance
+  source: src-1
+  locator: 'Form 10-K, Note 19: Cyber Related Matters (Expenses Incurred and Future Costs)'
+  quote: >
+    For the fiscal year ended November 30, 2023, we incurred $1.5 million of costs
+    related to the MOVEit Vulnerability. The costs recognized are net of received
+    and expected insurance recoveries of approximately $3.7 million.
+  values:
+    qualifier: exact
+    amount: '1500000'
+    period_start: '2022-12-01'
+    period_end: '2023-11-30'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Progress Software Corporation'
+  title: Form 10-K for the fiscal year ended 30 November 2023
+  url: https://www.sec.gov/Archives/edgar/data/876167/000087616724000031/prgs-20231130.htm
+  published: '2024-01-26'
+  retrieved: '2026-11-20'
+  sec: {form: 10-K, cik: '0000876167', accession: 0000876167-24-000031}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-20'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
