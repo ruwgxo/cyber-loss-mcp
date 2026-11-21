@@ -30,6 +30,16 @@ VALID_CALLS: list[tuple[str, dict[str, Any]]] = [
     ("get_incident", {"incident_id": "inc-2018-british-airways"}),
     ("loss_statistics", {"group_by": "country", "loss_type": "regulatory_fine", "currency": "GBP"}),
     (
+        "loss_statistics",
+        {
+            "group_by": "year",
+            "loss_type": "incident_costs_total",
+            "currency": "USD",
+            "insurance_basis": "gross",
+            "cumulative": False,
+        },
+    ),
+    (
         "estimate_loss_range",
         {"attack_type": "ransomware", "loss_type": "regulatory_fine", "currency": "GBP"},
     ),
@@ -121,6 +131,21 @@ async def test_each_tool_returns_envelope(client: Client, name: str, args: dict[
             "estimate_loss_range",
             {"attack_type": "apt", "loss_type": "ransom", "currency": "USD"},
             "Input should be",
+        ),
+        (
+            "estimate_loss_range",
+            {
+                "attack_type": "ransomware",
+                "loss_type": "ransom",
+                "currency": "USD",
+                "insurance_basis": "net",
+            },
+            "Input should be",
+        ),
+        (
+            "loss_statistics",
+            {"group_by": "year", "loss_type": "ransom", "currency": "USD", "cumulative": "no"},
+            "valid boolean",
         ),
         ("get_aggregates", {"category": "Robert'); DROP TABLE"}, "should match pattern"),
         ("get_aggregates", {"category": "bec"}, "unknown category"),

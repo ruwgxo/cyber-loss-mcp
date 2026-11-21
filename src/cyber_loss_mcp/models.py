@@ -140,6 +140,8 @@ class IncidentResponse(_Envelope):
 
 class Group(_Model):
     key: str
+    insurance_basis: str
+    cumulative: bool
     n_figures: int
     n_incidents: int
     min: str | None
@@ -155,6 +157,8 @@ class StatisticsResult(_Model):
     loss_type: str
     currency: str
     status: str
+    insurance_basis: str | None
+    cumulative: bool | None
     groups: list[Group]
     method: str
     notes: list[str]
@@ -201,6 +205,8 @@ class EstimateResult(_Model):
     minimum_comparables: int
     loss_type: str
     currency: str
+    insurance_basis: str | None
+    cumulative: bool | None
     comparables: list[Comparable]
     excluded: list[ExcludedIncident]
     observed: Observed | None

@@ -239,6 +239,35 @@ def test_statistics_exclusions_are_listed(tmp_path: Path) -> None:
     assert_envelope(r)
 
 
+def test_statistics_never_pool_insurance_basis_or_period(tmp_path: Path) -> None:
+    ds = ds_of(
+        tmp_path,
+        [
+            synthetic.incident(1, amounts=[("$1,000,000", "1000000")]),
+            synthetic.incident(
+                2, amounts=[("$2,000,000", "2000000")], insurance_basis="net_of_insurance"
+            ),
+            synthetic.incident(3, amounts=[("$3,000,000", "3000000")], cumulative=True),
+            synthetic.incident(4, amounts=[("$4,000,000", "4000000")]),
+        ],
+    )
+    r = service.loss_statistics(ds, group_by="country", loss_type="remediation", currency="USD")
+    groups = {(g.insurance_basis, g.cumulative): g.n_figures for g in r.result.groups}
+    assert groups == {("gross", False): 2, ("gross", True): 1, ("net_of_insurance", False): 1}
+    assert any("like for like" in n for n in r.result.notes)
+    only = service.loss_statistics(
+        ds,
+        group_by="country",
+        loss_type="remediation",
+        currency="USD",
+        insurance_basis="gross",
+        cumulative=False,
+    )
+    assert [(g.insurance_basis, g.cumulative, g.n_figures) for g in only.result.groups] == [
+        ("gross", False, 2)
+    ]
+
+
 def test_statistics_attack_type_groups_overlap(tmp_path: Path) -> None:
     ds = ds_of(tmp_path, [synthetic.incident(1, attack_types=["ransomware", "data_extortion"])])
     r = service.loss_statistics(ds, group_by="attack_type", loss_type="remediation", currency="USD")
@@ -292,6 +321,31 @@ def test_estimate_with_enough_comparables(tmp_path: Path) -> None:
     )  # fmt: skip
     assert any("not the mode" in c for c in res.caveats)
     assert_envelope(r)
+
+
+def test_estimate_refuses_mixed_bases_and_periods(tmp_path: Path) -> None:
+    net = synthetic.incident(
+        6, amounts=[("$6,000,000", "6000000")], insurance_basis="net_of_insurance"
+    )
+    cum = synthetic.incident(7, amounts=[("$7,000,000", "7000000")], cumulative=True)
+    ds = five(tmp_path, [net, cum])
+    mixed = service.estimate_loss_range(
+        ds, attack_type="ransomware", loss_type="remediation", currency="USD"
+    )
+    assert mixed.result.outcome == "refused"
+    assert mixed.result.reason is not None
+    assert "5 gross, 1 gross cumulative, 1 net_of_insurance" in mixed.result.reason
+    assert mixed.result.observed is None
+    chosen = service.estimate_loss_range(
+        ds,
+        attack_type="ransomware",
+        loss_type="remediation",
+        currency="USD",
+        insurance_basis="gross",
+        cumulative=False,
+    )
+    assert (chosen.result.outcome, chosen.result.n) == ("estimated", 5)
+    assert (chosen.result.insurance_basis, chosen.result.cumulative) == ("gross", False)
 
 
 def test_estimate_never_sums_an_incident(tmp_path: Path) -> None:
