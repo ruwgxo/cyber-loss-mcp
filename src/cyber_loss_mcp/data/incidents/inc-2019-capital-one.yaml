@@ -1,0 +1,66 @@
+title: Capital One cybersecurity incident, 2019
+id: inc-2019-capital-one
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Capital One Financial Corporation
+  organisation_kind: public_company
+  country: US
+  sector: '52'
+  sector_basis: 'EDGAR SIC 6021 (National Commercial Banks), NAICS sector 52'
+  first_disclosed: '2020-02-20'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-K says an outside individual gained unauthorized access and obtained
+    personal information relating to credit card applicants and customers, by
+    exploiting a specific configuration vulnerability.
+  attack_type_source: src-1
+  summary: >
+    On 29 July 2019 Capital One announced unauthorized access by an outside
+    individual, on 22 and 23 March 2019, to personal information relating to credit
+    card applicants and customers. Its 2019 Form 10-K reports the year’s incremental
+    expenses.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$72 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: gross
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1 (Business), Cybersecurity Incident'
+  quote: >
+    During the year, we incurred $72 million of incremental expenses related to the
+    remediation of and response to the Cybersecurity Incident
+  values:
+    qualifier: exact
+    amount: '72000000'
+    period_start: '2019-01-01'
+    period_end: '2019-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Capital One Financial Corporation'
+  title: Form 10-K for the year ended 31 December 2019
+  url: https://www.sec.gov/Archives/edgar/data/927628/000092762820000102/cof-12312019x10k.htm
+  published: '2020-02-20'
+  retrieved: '2026-11-21'
+  sec: {form: 10-K, cik: '0000927628', accession: 0000927628-20-000102}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    Insurance recoveries in the same sentence are not recorded as losses.

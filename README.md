@@ -11,7 +11,7 @@ source discloses and figures that are estimates are kept apart and labelled.
 A figure that can't be checked against its source isn't included.
 
 > **Status: server built; dataset growing; not yet released.** The dataset holds
-> 17 incidents (fines from UK ICO penalty notices and SEC enforcement actions, and costs,
+> 25 incidents (fines from UK ICO penalty notices and SEC enforcement actions, and costs,
 > settlements and fines disclosed in SEC filings), each checked in CI
 > ([how](docs/VALIDATION.md)). The six tools below are implemented and tested. Setup
 > instructions and a client configuration example come with the first release candidate.

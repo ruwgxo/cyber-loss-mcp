@@ -1,0 +1,63 @@
+title: Home Depot payment data breach, 2014
+id: inc-2014-home-depot
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: The Home Depot, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '44-45'
+  sector_basis: 'EDGAR SIC 5211 (Retail-Lumber and Other Building Materials Dealers), NAICS sector 44-45'
+  first_disclosed: '2017-03-23'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-K says the Data Breach involved the theft of payment card information and
+    customer email addresses through unauthorized access to the company’s systems.
+  attack_type_source: src-1
+  summary: >
+    Home Depot discovered a breach of its payment data systems in the third quarter
+    of fiscal 2014. Its fiscal 2016 Form 10-K reports the cumulative expenses
+    recorded for the breach, net of expected insurance recoveries.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$198 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: net_of_insurance
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    Since the Data Breach occurred, we have recorded $198 million of pretax
+    expenses, net of expected insurance recoveries, in connection with the Data
+    Breach
+  values:
+    qualifier: exact
+    amount: '198000000'
+    period_end: '2017-01-29'
+    cumulative: true
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'The Home Depot, Inc.'
+  title: Form 10-K for the fiscal year ended 29 January 2017
+  url: https://www.sec.gov/Archives/edgar/data/354950/000035495017000005/hd-01292017x10xk.htm
+  published: '2017-03-23'
+  retrieved: '2026-11-21'
+  sec: {form: 10-K, cik: '0000354950', accession: 0000354950-17-000005}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.

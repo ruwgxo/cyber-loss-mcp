@@ -1,0 +1,66 @@
+title: Uber data breach, 2016
+id: inc-2016-uber
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Uber Technologies, Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '56'
+  sector_basis: 'EDGAR SIC 7389 (Services-Business Services, NEC), NAICS sector 56'
+  first_disclosed: '2021-05-06'
+  attack_types: [unauthorised_access]
+  attack_type_basis: >
+    The 10-Q says that in October and November of 2016 outside actors downloaded the
+    personal data of approximately 57 million drivers and consumers worldwide.
+  attack_type_source: src-1
+  summary: >
+    In October and November 2016 outside actors downloaded the personal data of
+    about 57 million Uber drivers and consumers. In September 2018 Uber settled with
+    the attorneys general of all 50 US states and the District of Columbia over its
+    failure to report the incident for about a year.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: '$148 million'
+  loss_type: settlement
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-Q, Part II, Item 1A (Risk Factors)'
+  quote: >
+    we settled with the Attorneys General of all 50 U.S. states and the District of
+    Columbia through stipulated judgments and payment in an aggregate amount of $148
+    million related to our failure to report the incident for approximately one
+    year.
+  values:
+    qualifier: exact
+    amount: '148000000'
+    period_start: '2018-09-01'
+    period_end: '2018-09-30'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Uber Technologies, Inc.'
+  title: Form 10-Q for the quarter ended 31 March 2021
+  url: https://www.sec.gov/Archives/edgar/data/1543151/000154315121000029/uber-20210331.htm
+  published: '2021-05-06'
+  retrieved: '2026-11-21'
+  sec: {form: 10-Q, cik: '0001543151', accession: 0001543151-21-000029}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.

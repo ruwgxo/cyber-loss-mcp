@@ -1,0 +1,91 @@
+title: Merck network cyber-attack, 2017
+id: inc-2017-merck
+updated: '2026-11-21'
+standard: '2.0.0'
+profile: ../../standards/20261106__Cyber_Loss_Incident_Profile_by_Raghav_Dinesh.yaml
+inline_markup: none
+meta:
+  record_schema: '1.0.0'
+
+incident:
+  organisation: Merck & Co., Inc.
+  organisation_kind: public_company
+  country: US
+  sector: '31-33'
+  sector_basis: 'EDGAR SIC 2834 (Pharmaceutical Preparations), NAICS sector 31-33'
+  first_disclosed: '2018-02-27'
+  attack_types: [not_disclosed]
+  attack_type_basis: >
+    The 10-K describes a network cyber-attack in 2017 that disrupted worldwide
+    operations, including manufacturing, research and sales, without naming the kind
+    of attack.
+  attack_type_source: src-1
+  summary: >
+    A network cyber-attack in 2017 disrupted Merck’s worldwide operations, including
+    manufacturing, research and sales. Its 2017 Form 10-K reports the effect on 2017
+    sales and the year’s related expenses.
+
+techniques: []
+
+loss_figures:
+- id: fig-1
+  as_stated: 'approximately $260 million'
+  loss_type: revenue_impact
+  status: reported
+  currency: USD
+  insurance_basis: not_stated
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    Due to the cyber-attack, as anticipated, the Company was unable to fulfill
+    orders for certain products in certain markets, which had an unfavorable effect
+    on sales in 2017 of approximately $260 million.
+  values:
+    qualifier: approximately
+    amount: '260000000'
+    period_start: '2017-01-01'
+    period_end: '2017-12-31'
+    cumulative: false
+- id: fig-2
+  as_stated: '$285 million'
+  loss_type: incident_costs_total
+  status: reported
+  currency: USD
+  insurance_basis: net_of_insurance
+  source: src-1
+  locator: 'Form 10-K, Part I, Item 1A (Risk Factors)'
+  quote: >
+    Research and Development expenses, which aggregated $285 million in 2017, net of
+    insurance recoveries of approximately $45 million.
+  values:
+    qualifier: exact
+    amount: '285000000'
+    period_start: '2017-01-01'
+    period_end: '2017-12-31'
+    cumulative: false
+
+sources:
+- id: src-1
+  type: sec_filing
+  publisher: 'Merck & Co., Inc.'
+  title: Form 10-K for the year ended 31 December 2017
+  url: https://www.sec.gov/Archives/edgar/data/310158/000031015818000005/mrk1231201710k.htm
+  published: '2018-02-27'
+  retrieved: '2026-11-21'
+  sec: {form: 10-K, cik: '0000310158', accession: 0000310158-18-000005}
+
+verification:
+- figure: fig-1
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The filing's projection of a further effect on 2018 sales is not recorded,
+    because its period ends after the filing date.
+- figure: fig-2
+  checked_on: '2026-11-21'
+  method: >
+    Fetched the filing from EDGAR, found the quoted text in the filing, and
+    confirmed amount, currency, period, qualifier and insurance basis against it.
+    The filing's projection of a further effect on 2018 sales is not recorded,
+    because its period ends after the filing date.
